@@ -5,8 +5,9 @@ public class TileScript : MonoBehaviour
 {
 
     private SpriteRenderer spriteRenderer;
-    private WallScript leftWall, rightWall, upWall, downWall;
     private float wallPos = 0.265f;
+    
+    private WallScript[] walls = new WallScript[4];
 
     public Sprite startingSprite;
     public Sprite visitedSprite;
@@ -15,50 +16,112 @@ public class TileScript : MonoBehaviour
     [HideInInspector]
     public int x, y;
 
-    public enum Directions { Centre = 0, Up = 1, Right = 2, Down = 3, Left = 4 };
+    public enum Directions { Up, Right, Down, Left, Centre };
 
     public WallScript wall;
-    private Dictionary<Directions, WallScript> walls = new Dictionary<Directions, WallScript>();
-    private Dictionary<Directions, WallScript> correspondingWalls = new Dictionary<Directions, WallScript>();
+    private Dictionary<Directions, WallScript> wallDirs = new Dictionary<Directions, WallScript>();
+    private Dictionary<Directions, WallScript> correspondingWallDirs = new Dictionary<Directions, WallScript>();
+    private Dictionary<Directions, Directions> correspondingDirs = new Dictionary<Directions, Directions>();
 
     void Awake ()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+
+        correspondingDirs.Add(Directions.Up, Directions.Down);
+        correspondingDirs.Add(Directions.Right, Directions.Left);
+        correspondingDirs.Add(Directions.Down, Directions.Up);
+        correspondingDirs.Add(Directions.Left, Directions.Right);
+
         CreateWalls();
+    }
+
+    void InitWall(Directions dir, Vector3 offset, int rotation)
+    {
+        int d = (int)dir;
+        walls[d] = Instantiate(wall, this.transform, false) as WallScript;
+        walls[d].transform.localPosition = offset;
+        walls[d].transform.localRotation = Quaternion.Euler(0, 0, rotation);
+        wallDirs.Add(dir, walls[d]);
+        correspondingWallDirs.Add(correspondingDirs[dir], walls[d]);
     }
 
     void CreateWalls()
     {
-        walls.Clear();
-        correspondingWalls.Clear();
+        wallDirs.Clear();
+        correspondingWallDirs.Clear();
 
+        WallScript upWall = walls[(int)Directions.Up];
+        WallScript rightWall = walls[(int)Directions.Right];
+        WallScript downWall = walls[(int)Directions.Down];
+        WallScript leftWall = walls[(int)Directions.Left];
+        
         if (leftWall != null) Destroy(leftWall.gameObject);
         if (rightWall != null) Destroy(rightWall.gameObject);
         if (upWall != null) Destroy(upWall.gameObject);
         if (downWall != null) Destroy(downWall.gameObject);
 
-        leftWall = Instantiate(wall, this.transform, false) as WallScript;
-        leftWall.transform.localPosition = new Vector3(-wallPos, 0, 0);
-        leftWall.transform.localRotation = Quaternion.Euler(0, 0, 90);
-        walls.Add(Directions.Left, leftWall);
-        correspondingWalls.Add(Directions.Right, leftWall);
+        InitWall(Directions.Up, new Vector3(0, wallPos, 0), 0);
+        InitWall(Directions.Right, new Vector3(wallPos, 0, 0), 90);
+        InitWall(Directions.Down, new Vector3(0, -wallPos, 0), 0);
+        InitWall(Directions.Left, new Vector3(-wallPos, 0, 0), 90);
 
-        rightWall = Instantiate(wall, this.transform, false) as WallScript;
-        rightWall.transform.localPosition = new Vector3(wallPos, 0, 0);
-        rightWall.transform.localRotation = Quaternion.Euler(0, 0, 90);
-        walls.Add(Directions.Right, rightWall);
-        correspondingWalls.Add(Directions.Left, rightWall);
+    }
 
-        upWall = Instantiate(wall, this.transform, false) as WallScript;
-        upWall.transform.localPosition = new Vector3(0, wallPos, 0);
-        walls.Add(Directions.Up, upWall);
-        correspondingWalls.Add(Directions.Down, upWall);
+    void ReactivateWalls()
+    {
+        for (int i = 0; i < walls.Length; i++)
+        {
+            walls[i].gameObject.SetActive(true);
+        }
+    }
 
-        downWall = Instantiate(wall, this.transform, false) as WallScript;
-        downWall.transform.localPosition = new Vector3(0, -wallPos, 0);
-        walls.Add(Directions.Down, downWall);
-        correspondingWalls.Add(Directions.Up, downWall);
+    private char WallExists(WallScript wall)
+    {
+        if (wall.gameObject.activeSelf) return '1';
+        else return '0';
+    }
 
+    public string GetWallCode()
+    {
+        string result = "";
+
+        for (int i = 0; i < 4; i++)
+        {
+            result += WallExists(walls[i]);
+        }
+
+        return result;
+    }
+
+    public void RemoveWallsBetweenTiles(TileScript otherTile)
+    {
+        Directions direction;
+
+        Vector3 thisPos = this.transform.position;
+        Vector3 otherPos = otherTile.transform.position;
+
+        if (otherPos.x - thisPos.x > 0) direction = Directions.Right;
+        else if (otherPos.x - thisPos.x < 0) direction = Directions.Left;
+        else if (otherPos.y - thisPos.y > 0) direction = Directions.Up;
+        else if (otherPos.y - thisPos.y < 0) direction = Directions.Down;
+        else return; // the two tiles must be the same
+
+        this.RemoveWall(direction);
+        otherTile.RemoveCorrespondingWall(direction);
+
+    }
+
+    private void RemoveWall(Directions direction)
+    {
+        wallDirs[direction].gameObject.SetActive(false);
+        //if (walls.Remove(direction)) Debug.Log("wall successfully removed");
+    }
+
+    private void RemoveCorrespondingWall(Directions direction)
+    {
+        correspondingWallDirs[direction].gameObject.SetActive(false);
+        //Destroy(correspondingWallDirs[direction].gameObject);
+        //if (correspondingWalls.Remove(direction)) Debug.Log("wall successfully removed");
     }
 
     public void Visit()
@@ -74,35 +137,7 @@ public class TileScript : MonoBehaviour
     public void ResetTile()
     {
         spriteRenderer.sprite = startingSprite;
-        CreateWalls();
-    }
-
-    public void DeleteWallsBetweenTiles(TileScript otherTile)
-    {
-        Directions direction;
-
-        if (otherTile.x - this.x > 0) direction = Directions.Right;
-        else if (otherTile.x - this.x < 0) direction = Directions.Left;
-        else if (otherTile.y - this.y > 0) direction = Directions.Down;
-        else if (otherTile.y - this.y < 0) direction = Directions.Up;
-        else return; // the two tiles must be the same
-
-        this.DeleteWall(direction);
-        otherTile.DeleteCorrespondingWall(direction);
-
-    }
-
-    public void DeleteWall(Directions direction)
-    {
-        Destroy(walls[direction].gameObject);
-        //if (walls.Remove(direction)) Debug.Log("wall successfully removed");
-    }
-
-    public void DeleteCorrespondingWall(Directions direction)
-    {
-        Destroy(correspondingWalls[direction].gameObject);
-        //if (correspondingWalls.Remove(direction)) Debug.Log("wall successfully removed");
-
+        ReactivateWalls();
     }
 
 }

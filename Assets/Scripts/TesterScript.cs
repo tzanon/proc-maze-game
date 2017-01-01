@@ -5,18 +5,16 @@ public class TesterScript : MonoBehaviour {
 
     public TileScript leftTile, rightTile;
 
-	// Use this for initialization
-	void Start () {
-        leftTile.x = -2;
-        leftTile.y = 0;
-
-        rightTile.x = 5;
-        rightTile.y = 0;
-	}
+	void Start ()
+    {
+        Debug.Log("left walls: " + leftTile.GetWallCode() + ", right walls: " + rightTile.GetWallCode());
+    }
 
     public void DeleteWalls()
     {
-        leftTile.DeleteWallsBetweenTiles(rightTile);
+        
+        leftTile.RemoveWallsBetweenTiles(rightTile);
+        Debug.Log("left walls: " + leftTile.GetWallCode() + ", right walls: " + rightTile.GetWallCode());
     }
 
 }

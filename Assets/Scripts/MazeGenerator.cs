@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 
 public class MazeGenerator : MonoBehaviour
 {
@@ -44,17 +45,17 @@ public class MazeGenerator : MonoBehaviour
         isGenerating = false;
     }
 
-    void UpdateStackCount()
+    private void UpdateStackCount()
     {
         stackCount.text = "Tiles on stack: " + tileStack.Count;
     }
 
-    void UpdateUnvisitedTiles()
+    private void UpdateUnvisitedTiles()
     {
         setCount.text = "Unvisited tiles: " + unvisitedTiles.Count;
     }
 
-    void CreateGrid()
+    private void CreateGrid()
     {
         for (int i = 0; i < grid.GetLength(0); i++)
         {
@@ -74,6 +75,8 @@ public class MazeGenerator : MonoBehaviour
     
     public void ResetGrid()
     {
+        if (isGenerating) return;
+
         tileStack.Clear();
         UpdateStackCount();
 
@@ -148,7 +151,7 @@ public class MazeGenerator : MonoBehaviour
                 UpdateStackCount();
                 currentTile.OnStack();
 
-                currentTile.DeleteWallsBetweenTiles(neighbourTile);
+                currentTile.RemoveWallsBetweenTiles(neighbourTile);
 
                 
                 currentTile = neighbourTile;
@@ -189,8 +192,7 @@ public class MazeGenerator : MonoBehaviour
         isGenerating = false;
     }
 
-
-    List<TileScript> GetUnvisitedNeighbours(TileScript currentTile)
+    private List<TileScript> GetUnvisitedNeighbours(TileScript currentTile)
     {
         List<TileScript> unvisitedNeighbours = new List<TileScript>();
         int x = currentTile.x;
@@ -204,18 +206,41 @@ public class MazeGenerator : MonoBehaviour
         return unvisitedNeighbours;
     }
 
-    bool InXBounds(int x)
+    private bool InXBounds(int x)
     {
         return
             (x >= 0 &&
             x < grid.GetLength(1));
     }
 
-    bool InYBounds(int y)
+    private bool InYBounds(int y)
     {
         return
             (y >= 0 &&
             y < grid.GetLength(0));
+    }
+
+    public void SaveMaze()
+    {
+        StreamWriter writer = new StreamWriter("a_maze.txt");
+
+        writer.WriteLine(gridHeight);
+        writer.WriteLine(gridWidth);
+
+        for (int i = 0; i < gridHeight; i++)
+        {
+            for (int j = 0; j < gridWidth; j++)
+            {
+                string wallCode = grid[i,j].GetWallCode();
+            }
+        }
+
+
+    }
+
+    public void ReadMaze(string filename)
+    {
+
     }
 
 }
