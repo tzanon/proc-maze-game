@@ -23,7 +23,7 @@ public class TileScript : MonoBehaviour
     private Dictionary<Directions, WallScript> correspondingWallDirs = new Dictionary<Directions, WallScript>();
     private Dictionary<Directions, Directions> correspondingDirs = new Dictionary<Directions, Directions>();
 
-    void Awake ()
+    private void Awake ()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
 
@@ -35,7 +35,7 @@ public class TileScript : MonoBehaviour
         CreateWalls();
     }
 
-    void InitWall(Directions dir, Vector3 offset, int rotation)
+    private void InitWall(Directions dir, Vector3 offset, int rotation)
     {
         int d = (int)dir;
         walls[d] = Instantiate(wall, this.transform, false) as WallScript;
@@ -45,7 +45,7 @@ public class TileScript : MonoBehaviour
         correspondingWallDirs.Add(correspondingDirs[dir], walls[d]);
     }
 
-    void CreateWalls()
+    private void CreateWalls()
     {
         wallDirs.Clear();
         correspondingWallDirs.Clear();
@@ -54,11 +54,6 @@ public class TileScript : MonoBehaviour
         WallScript rightWall = walls[(int)Directions.Right];
         WallScript downWall = walls[(int)Directions.Down];
         WallScript leftWall = walls[(int)Directions.Left];
-        
-        if (leftWall != null) Destroy(leftWall.gameObject);
-        if (rightWall != null) Destroy(rightWall.gameObject);
-        if (upWall != null) Destroy(upWall.gameObject);
-        if (downWall != null) Destroy(downWall.gameObject);
 
         InitWall(Directions.Up, new Vector3(0, wallPos, 0), 0);
         InitWall(Directions.Right, new Vector3(wallPos, 0, 0), 90);
@@ -67,30 +62,31 @@ public class TileScript : MonoBehaviour
 
     }
 
-    void ReactivateWalls()
+    private void ReactivateWalls()
     {
-        for (int i = 0; i < walls.Length; i++)
-        {
-            walls[i].gameObject.SetActive(true);
-        }
-    }
-
-    private char WallExists(WallScript wall)
-    {
-        if (wall.gameObject.activeSelf) return '1';
-        else return '0';
+        SetWallsFromCode("1111");
     }
 
     public string GetWallCode()
     {
-        string result = "";
+        string code = "";
 
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < walls.Length; i++)
         {
-            result += WallExists(walls[i]);
+            if (walls[i].gameObject.activeSelf) code += '1';
+            else code += '0';
         }
 
-        return result;
+        return code;
+    }
+
+    public void SetWallsFromCode(string code)
+    {
+        for (int i = 0; i < walls.Length; i++)
+        {
+            if (code[i] == '1') walls[i].gameObject.SetActive(true);
+            else walls[i].gameObject.SetActive(false);
+        }
     }
 
     public void RemoveWallsBetweenTiles(TileScript otherTile)

@@ -1,13 +1,19 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 public class MazeGenerator : MonoBehaviour
 {
+    public GameObject GridObject;
+
     public Text stackCount;
     public Text setCount;
+    public InputField saveFileField;
+    public InputField loadFileField;
 
     public float delay;
 
@@ -32,10 +38,6 @@ public class MazeGenerator : MonoBehaviour
 
     void Start()
     {
-        currX = startX;
-        currY = startY;
-        position = new Vector2(currX, currY);
-
         grid = new TileScript[gridHeight, gridWidth];
         CreateGrid();
 
@@ -57,6 +59,8 @@ public class MazeGenerator : MonoBehaviour
 
     private void CreateGrid()
     {
+        position = new Vector2(startX, startY);
+
         for (int i = 0; i < grid.GetLength(0); i++)
         {
             for (int j = 0; j < grid.GetLength(1); j++)
@@ -73,6 +77,23 @@ public class MazeGenerator : MonoBehaviour
         }
     }
     
+    private void DestroyGrid()
+    {
+        tileStack.Clear();
+        UpdateStackCount();
+
+        unvisitedTiles.Clear();
+        UpdateUnvisitedTiles();
+
+        for (int i = 0; i < grid.GetLength(0); i++)
+        {
+            for (int j = 0; j < grid.GetLength(1); j++)
+            {
+                Destroy(grid[i,j].gameObject);
+            }
+        }
+    }
+
     public void ResetGrid()
     {
         if (isGenerating) return;
@@ -129,7 +150,7 @@ public class MazeGenerator : MonoBehaviour
         isGenerating = true;
 
         int initY = grid.GetLength(0) - 1;
-        int initX = Random.Range(0, grid.GetLength(1));
+        int initX = UnityEngine.Random.Range(0, grid.GetLength(1));
 
         TileScript currentTile = grid[initY, initX];
         unvisitedTiles.Remove(currentTile);
@@ -144,7 +165,7 @@ public class MazeGenerator : MonoBehaviour
 
             if (unvisitedNeighbours.Count > 0)
             {
-                int neighbourNum = Random.Range(0, unvisitedNeighbours.Count);
+                int neighbourNum = UnityEngine.Random.Range(0, unvisitedNeighbours.Count);
 
                 TileScript neighbourTile = unvisitedNeighbours[neighbourNum];
                 tileStack.Push(currentTile);
@@ -169,7 +190,7 @@ public class MazeGenerator : MonoBehaviour
             {
                 TileScript[] unvisited = new TileScript[unvisitedTiles.Count];
                 unvisitedTiles.CopyTo(unvisited);
-                int rand = Random.Range(0, unvisited.GetLength(0));
+                int rand = UnityEngine.Random.Range(0, unvisited.GetLength(0));
 
                 currentTile = unvisited[rand];
                 unvisitedTiles.Remove(currentTile);
@@ -222,25 +243,83 @@ public class MazeGenerator : MonoBehaviour
 
     public void SaveMaze()
     {
-        StreamWriter writer = new StreamWriter("a_maze.txt");
+        if (isGenerating) return;
 
-        writer.WriteLine(gridHeight);
-        writer.WriteLine(gridWidth);
-
+        string filePath = @"MazeFiles\" + saveFileField.text + ".txt";
+        StreamWriter mazeFile = new StreamWriter(filePath);
+        
+        mazeFile.WriteLine(gridHeight);
+        mazeFile.WriteLine(gridWidth);
+        
         for (int i = 0; i < gridHeight; i++)
         {
             for (int j = 0; j < gridWidth; j++)
             {
                 string wallCode = grid[i,j].GetWallCode();
+                mazeFile.WriteLine(wallCode);
             }
         }
 
+        mazeFile.Close();
+
+        Debug.Log("Saving file...");
+    }
+
+    public void DisplayMazeFiles()
+    {
 
     }
 
-    public void ReadMaze(string filename)
+    public void LoadMaze(string fname)
     {
+        if (isGenerating) return;
+        /*
+        string[] mazeFiles = Directory.GetFiles(@"MazeFiles\", ".txt")
+            .Select(Path.GetFileName)
+            .ToArray();
+        */
+        string filePath = @"MazeFiles\" + fname + ".txt";
 
+        StreamReader mazeFile;
+
+        try
+        {
+            using (StreamReader mazeFileReader = new StreamReader(filePath))
+            {
+                Debug.Log("Loading file...");
+                mazeFile = new StreamReader(filePath);
+                gridHeight = Int32.Parse(mazeFile.ReadLine());
+                gridWidth = Int32.Parse(mazeFile.ReadLine());
+
+                grid = new TileScript[gridHeight, gridWidth];
+                CreateGrid();
+
+                for (int i = 0; i < grid.GetLength(0); i++)
+                {
+                    for (int j = 0; j < grid.GetLength(1); j++)
+                    {
+                        string wallCode = mazeFile.ReadLine();
+                        
+                    }
+                }
+
+            }
+        }
+        catch (IOException e)
+        {
+            Console.WriteLine("File not found.");
+            Console.WriteLine(e.Message);
+        }
+
+    }
+
+    public void Test()
+    {
+        DestroyGrid();
+        gridHeight = 5;
+        gridWidth = 5;
+        grid = new TileScript[gridHeight, gridWidth];
+        CreateGrid();
     }
 
 }
