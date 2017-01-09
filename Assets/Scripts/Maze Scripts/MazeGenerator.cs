@@ -4,131 +4,118 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 public class MazeGenerator : MonoBehaviour
 {
-    public GameObject GridObject;
 
     public Text stackCount;
     public Text setCount;
     public InputField saveFileField;
     public InputField loadFileField;
+    public TileScript tile;
 
-    public float delay;
+    private const float delay = 0.05f; // delay for "animation"
+    private Maze _maze; // the maze object to be used
 
-    [Range(1, 24)]
-    public int gridWidth = 21;
-
-    [Range(1, 12)]
-    public int gridHeight = 11;
-    public TileScript Tile;
+    public Maze Maze
+    {
+        get { return _maze; }
+    }
 
     private bool isGenerating;
-
-    private const float startX = -8.25f;
-    private const float startY = 4f;
-    private const float incr = 0.535f;
-    private float currX, currY;
-    private Vector2 position;
-
-    private TileScript[,] grid;
     private Stack<TileScript> tileStack = new Stack<TileScript>();
     private HashSet<TileScript> unvisitedTiles = new HashSet<TileScript>();
 
     void Start()
     {
-        grid = new TileScript[gridHeight, gridWidth];
-        CreateGrid();
-
         UpdateStackCount();
         UpdateUnvisitedTiles();
 
         isGenerating = false;
     }
 
+    // debugging GUI update functions
     private void UpdateStackCount()
     {
         stackCount.text = "Tiles on stack: " + tileStack.Count;
     }
-
     private void UpdateUnvisitedTiles()
     {
         setCount.text = "Unvisited tiles: " + unvisitedTiles.Count;
     }
 
-    private void CreateGrid()
+    // prepare a grid for the algorithm to work on
+    public void InitializeGrid()
     {
-        position = new Vector2(startX, startY);
-
-        for (int i = 0; i < grid.GetLength(0); i++)
-        {
-            for (int j = 0; j < grid.GetLength(1); j++)
-            {
-                TileScript newTile = grid[i, j] = Instantiate(Tile, position, Quaternion.identity) as TileScript;
-                newTile.x = j;
-                newTile.y = i;
-                unvisitedTiles.Add(newTile);
-                UpdateUnvisitedTiles();
-                position.x += incr;
-            }
-            position.x = startX;
-            position.y -= incr;
-        }
-    }
-    
-    private void DestroyGrid()
-    {
-        tileStack.Clear();
-        UpdateStackCount();
-
-        unvisitedTiles.Clear();
-        UpdateUnvisitedTiles();
-
-        for (int i = 0; i < grid.GetLength(0); i++)
-        {
-            for (int j = 0; j < grid.GetLength(1); j++)
-            {
-                Destroy(grid[i,j].gameObject);
-            }
-        }
+        if (isGenerating || _maze == null) return;
+        _maze.CreateBlankGrid(); // create the actual grid
+        MarkTilesUnvisited();
     }
 
+    // reset the grid to its original state
     public void ResetGrid()
     {
-        if (isGenerating) return;
+        if (isGenerating || _maze == null) return; // don't reset if generating a maze...
 
+        // reset utiity data structures
         tileStack.Clear();
-        UpdateStackCount();
-
         unvisitedTiles.Clear();
+
+        // reset the grid's walls
+        _maze.ResetGrid();
+        MarkTilesUnvisited();
+
+        // update GUI display
+        UpdateStackCount();
+        UpdateUnvisitedTiles();
+    }
+
+    // destroys the grid
+    public void DestroyGrid()
+    {
+        if (isGenerating || _maze == null) return;
+
+        // reset utiity data structures
+        tileStack.Clear();
+        unvisitedTiles.Clear();
+
+        // destroy the grid's tiles
+        _maze.DestroyGrid();
+
+        // update GUI display
+        UpdateStackCount();
         UpdateUnvisitedTiles();
 
+    }
+
+    // marks all tiles in the grid as unvisited
+    private void MarkTilesUnvisited()
+    {
+        TileScript[,] grid = _maze.Grid;
         for (int i = 0; i < grid.GetLength(0); i++)
         {
             for (int j = 0; j < grid.GetLength(1); j++)
             {
                 TileScript tile = grid[i, j];
-                tile.ResetTile();
+                tile.UnVisit();
                 unvisitedTiles.Add(tile);
-                UpdateUnvisitedTiles();
             }
-            
         }
-
     }
 
+    // make a maze with an animation showing the generation process
     public void GenerateMazeWithDelay()
     {
-        
         if (!isGenerating) StartCoroutine(GenerateMaze(true));
     }
 
+    // make a maze with no animation
     public void GenerateMazeWithoutDelay()
     {
         if (!isGenerating) StartCoroutine(GenerateMaze(false));
     }
 
+    // generates a maze using randomized depth-first search with backtracking
     private IEnumerator GenerateMaze(bool withDelay)
     {
         /*
@@ -148,6 +135,8 @@ public class MazeGenerator : MonoBehaviour
          */
 
         isGenerating = true;
+
+        TileScript[,] grid = _maze.Grid;
 
         int initY = grid.GetLength(0) - 1;
         int initX = UnityEngine.Random.Range(0, grid.GetLength(1));
@@ -213,113 +202,32 @@ public class MazeGenerator : MonoBehaviour
         isGenerating = false;
     }
 
-    private List<TileScript> GetUnvisitedNeighbours(TileScript currentTile)
+    // gets all of the unvisited neighbour tiles of the given tile
+    public List<TileScript> GetUnvisitedNeighbours(TileScript currentTile)
     {
         List<TileScript> unvisitedNeighbours = new List<TileScript>();
         int x = currentTile.x;
         int y = currentTile.y;
 
-        if (InYBounds(y) && InXBounds(x+1) && unvisitedTiles.Contains(grid[y, x+1])) unvisitedNeighbours.Add(grid[y, x+1]);
-        if (InYBounds(y) && InXBounds(x-1) && unvisitedTiles.Contains(grid[y, x-1])) unvisitedNeighbours.Add(grid[y, x-1]);
-        if (InYBounds(y+1) && InXBounds(x) && unvisitedTiles.Contains(grid[y+1, x])) unvisitedNeighbours.Add(grid[y+1, x]);
-        if (InYBounds(y-1) && InXBounds(x) && unvisitedTiles.Contains(grid[y-1, x])) unvisitedNeighbours.Add(grid[y-1, x]);
+        TileScript[,] grid = _maze.Grid;
+
+        if (_maze.InBounds(x + 1, y) && unvisitedTiles.Contains(grid[y, x + 1])) unvisitedNeighbours.Add(grid[y, x + 1]);
+        if (_maze.InBounds(x - 1, y) && unvisitedTiles.Contains(grid[y, x - 1])) unvisitedNeighbours.Add(grid[y, x - 1]);
+        if (_maze.InBounds(x, y + 1) && unvisitedTiles.Contains(grid[y + 1, x])) unvisitedNeighbours.Add(grid[y + 1, x]);
+        if (_maze.InBounds(x, y - 1) && unvisitedTiles.Contains(grid[y - 1, x])) unvisitedNeighbours.Add(grid[y - 1, x]);
 
         return unvisitedNeighbours;
     }
 
-    private bool InXBounds(int x)
-    {
-        return
-            (x >= 0 &&
-            x < grid.GetLength(1));
-    }
-
-    private bool InYBounds(int y)
-    {
-        return
-            (y >= 0 &&
-            y < grid.GetLength(0));
-    }
-
-    public void SaveMaze()
-    {
-        if (isGenerating) return;
-
-        string filePath = @"MazeFiles\" + saveFileField.text + ".txt";
-        StreamWriter mazeFile = new StreamWriter(filePath);
-        
-        mazeFile.WriteLine(gridHeight);
-        mazeFile.WriteLine(gridWidth);
-        
-        for (int i = 0; i < gridHeight; i++)
-        {
-            for (int j = 0; j < gridWidth; j++)
-            {
-                string wallCode = grid[i,j].GetWallCode();
-                mazeFile.WriteLine(wallCode);
-            }
-        }
-
-        mazeFile.Close();
-
-        Debug.Log("Saving file...");
-    }
-
-    public void DisplayMazeFiles()
-    {
-
-    }
-
-    public void LoadMaze(string fname)
-    {
-        if (isGenerating) return;
-        /*
-        string[] mazeFiles = Directory.GetFiles(@"MazeFiles\", ".txt")
-            .Select(Path.GetFileName)
-            .ToArray();
-        */
-        string filePath = @"MazeFiles\" + fname + ".txt";
-
-        StreamReader mazeFile;
-
-        try
-        {
-            using (StreamReader mazeFileReader = new StreamReader(filePath))
-            {
-                Debug.Log("Loading file...");
-                mazeFile = new StreamReader(filePath);
-                gridHeight = Int32.Parse(mazeFile.ReadLine());
-                gridWidth = Int32.Parse(mazeFile.ReadLine());
-
-                grid = new TileScript[gridHeight, gridWidth];
-                CreateGrid();
-
-                for (int i = 0; i < grid.GetLength(0); i++)
-                {
-                    for (int j = 0; j < grid.GetLength(1); j++)
-                    {
-                        string wallCode = mazeFile.ReadLine();
-                        
-                    }
-                }
-
-            }
-        }
-        catch (IOException e)
-        {
-            Console.WriteLine("File not found.");
-            Console.WriteLine(e.Message);
-        }
-
-    }
-
     public void Test()
     {
+        /*
         DestroyGrid();
         gridHeight = 5;
         gridWidth = 5;
         grid = new TileScript[gridHeight, gridWidth];
         CreateGrid();
+        */
     }
 
 }

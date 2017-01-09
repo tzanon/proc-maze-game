@@ -1,24 +1,21 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.Collections;
 
 public class SceneLoader : MonoBehaviour {
 
-    public Scene SceneToLoad;
-
-	// Use this for initialization
-	void Start () {
-	    
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
-
-    void LoadScene()
+    public void QuitGame()
     {
-        SceneManager.LoadScene(SceneToLoad.name);
+        Application.Quit();
+    }
+
+    public void LoadSceneFromIndex(int index)
+    {
+        SceneManager.LoadScene(index);
+    }
+
+    public void LoadSceneFromString(string sceneName)
+    {
+        SceneManager.LoadScene(sceneName);
     }
 
 }

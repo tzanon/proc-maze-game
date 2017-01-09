@@ -38,9 +38,11 @@ public class TileScript : MonoBehaviour
     private void InitWall(Directions dir, Vector3 offset, int rotation)
     {
         int d = (int)dir;
+
         walls[d] = Instantiate(wall, this.transform, false) as WallScript;
         walls[d].transform.localPosition = offset;
         walls[d].transform.localRotation = Quaternion.Euler(0, 0, rotation);
+
         wallDirs.Add(dir, walls[d]);
         correspondingWallDirs.Add(correspondingDirs[dir], walls[d]);
     }
@@ -60,11 +62,6 @@ public class TileScript : MonoBehaviour
         InitWall(Directions.Down, new Vector3(0, -wallPos, 0), 0);
         InitWall(Directions.Left, new Vector3(-wallPos, 0, 0), 90);
 
-    }
-
-    private void ReactivateWalls()
-    {
-        SetWallsFromCode("1111");
     }
 
     public string GetWallCode()
@@ -130,10 +127,14 @@ public class TileScript : MonoBehaviour
         spriteRenderer.sprite = stackSprite;
     }
 
-    public void ResetTile()
+    public void UnVisit()
     {
         spriteRenderer.sprite = startingSprite;
-        ReactivateWalls();
+    }
+
+    public void ResetTile()
+    {
+        SetWallsFromCode("1111");
     }
 
 }
