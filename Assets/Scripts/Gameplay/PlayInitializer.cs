@@ -2,24 +2,50 @@
 
 public class PlayInitializer : MonoBehaviour {
 
-    /* 
-     * this script is run when the play scene starts
-     * it will load the level and then run the game logic script
-    */
+    public Maze MazeTemplate;
 
     private PlayLevelManager manager;
+    private Maze level;
+    private GameRunner runner;
+    private string filename;
 
 	// Use this for initialization
-	void Start () {
-        manager = GameObject.FindGameObjectWithTag("LevelManager").GetComponent<PlayLevelManager>();
-        if (manager.filename == null)
+	void Start()
+    {
+        TestRun();
+	}
+
+
+    private void TestRun()
+    {
+        level = Instantiate(MazeTemplate) as Maze;
+        level.MakeRandomMaze();
+
+        // make and activate game runner
+        //runner = Instantiate(runner) as GameRunner;
+        //runner.Level = level;
+
+    }
+
+
+    private void NormalRun()
+    {
+        //manager = GameObject.FindGameObjectWithTag("LevelManager").GetComponent<PlayLevelManager>();
+        level = Instantiate(level) as Maze;
+        filename = null;
+
+        if (filename == null) // make random level
         {
-            // make random level
+            level.MakeRandomMaze();
         }
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+        else // load level with the given name
+        {
+            level.LoadMaze(manager.filename);
+        }
+
+        // activate game runner
+        runner = Instantiate(runner) as GameRunner;
+        runner.Level = level;
+    }
+
 }
