@@ -5,6 +5,7 @@ public class GameRunner : MonoBehaviour
 {
 
     private Maze _level;
+    private TileScript[,] grid;
 
     public Maze Level
     {
@@ -17,6 +18,7 @@ public class GameRunner : MonoBehaviour
                 _level = value;
         }
     }
+    public GameObject Player;
 
 	// Use this for initialization
 	void Start()
@@ -29,6 +31,12 @@ public class GameRunner : MonoBehaviour
     {
 	    
 	}
+
+    private void SetLevel(Maze maze)
+    {
+        Level = maze;
+        grid = maze.Grid;
+    }
 
     
 

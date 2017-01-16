@@ -12,6 +12,8 @@ public class TileScript : MonoBehaviour
     public Sprite startingSprite;
     public Sprite visitedSprite;
     public Sprite stackSprite;
+    public Sprite beginSprite;
+    public Sprite endSprite;
 
     [HideInInspector]
     public int x, y;
@@ -132,9 +134,21 @@ public class TileScript : MonoBehaviour
         spriteRenderer.sprite = startingSprite;
     }
 
+    public void MakeStartTile()
+    {
+        spriteRenderer.sprite = beginSprite;
+    }
+
+    public void MakeEndTile()
+    {
+        spriteRenderer.sprite = endSprite;
+    }
+
     public void ResetTile()
     {
         SetWallsFromCode("1111");
     }
+
+    
 
 }

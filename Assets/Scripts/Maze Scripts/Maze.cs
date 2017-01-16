@@ -36,14 +36,16 @@ public class Maze : MonoBehaviour
         private set { _grid = value; }
     }
 
+    [HideInInspector]
+    public const int minHeight = 6, minWidth = 6,
+        maxHeight = 16, maxWidth = 32;
+
+    public bool withDelay;
+
     // for constructing the grid in the scene
     private const float startX = -8.25f;
     private const float startY = -4f;
     private const float incr = 0.535f;
-    private const int minHeight = 6;
-    private const int minWidth = 6;
-    private const int maxHeight = 16;
-    private const int maxWidth = 32;
     private Vector2 position;
 
     #region generation variables
@@ -64,9 +66,31 @@ public class Maze : MonoBehaviour
         UpdateStackCount();
         UpdateUnvisitedTiles();
         isGenerating = false;
+        withDelay = true;
     }
 
     #region general utility methods
+
+    public void MakeSmallMaze()
+    {
+        MakeBlankGrid(minHeight, minWidth);
+
+        StartGeneration();
+    }
+
+    public void MakeMedMaze()
+    {
+        MakeBlankGrid(maxHeight / 2, maxWidth / 2);
+
+        StartGeneration();
+    }
+
+    public void MakeLargeMaze()
+    {
+        MakeBlankGrid(maxHeight, maxWidth);
+
+        StartGeneration();
+    }
 
     // makes a new grid from scratch and generates a maze in it
     public void MakeRandomMaze()
@@ -74,14 +98,15 @@ public class Maze : MonoBehaviour
         int randHeight = UnityEngine.Random.Range(minHeight, maxHeight);
         int randWidth = UnityEngine.Random.Range(minWidth, maxWidth);
 
-        CreateBlankGrid(randHeight, randWidth);
+        MakeBlankGrid(randHeight, randWidth);
 
-        GenerateMazeWithDelay();
+        StartGeneration();
     }
 
     // creates a blank grid in preparation for generation or editing
-    public void CreateBlankGrid(int gridHeight, int gridWidth)
+    public void MakeBlankGrid(int gridHeight, int gridWidth)
     {
+        Debug.Log("making the codes...");
         string[,] gridCodes = new string[gridHeight, gridWidth];
 
         for (int i = 0; i < gridHeight; i++)
@@ -92,16 +117,18 @@ public class Maze : MonoBehaviour
             }
         }
 
-        CreateGridFromCodes(gridCodes);
+        MakeGridFromCodes(gridCodes);
         MarkAllTilesUnvisited();
         PrepareForGeneration();
     }
 
     // "fills" the grid by instantiating each tile with properties specified
-    public void CreateGridFromCodes(string[,] gridCodes)
+    public void MakeGridFromCodes(string[,] gridCodes)
     {
         DestroyGrid(); // previous grid's tiles will be removed
         Grid = new TileScript[gridCodes.GetLength(0), gridCodes.GetLength(1)];
+        Debug.Log("new height is " + Height);
+        Debug.Log("new width is " + Width);
 
         position = new Vector2(startX, startY);
 
@@ -252,21 +279,15 @@ public class Maze : MonoBehaviour
         }
     }
 
-    // make a maze with an animation showing the generation process
-    public void GenerateMazeWithDelay()
+    // starts the generation process
+    public void StartGeneration()
     {
-        if (!isGenerating) StartCoroutine(GenerateMaze(true));
-    }
-
-    // make a maze with no animation
-    public void GenerateMazeWithoutDelay()
-    {
-        if (!isGenerating) StartCoroutine(GenerateMaze(false));
+        if (!isGenerating) StartCoroutine(GenerateMaze());
     }
 
     // generates a maze using randomized depth-first search with backtracking
     // ***DO NOT MODIFY THIS METHOD***
-    private IEnumerator GenerateMaze(bool withDelay)
+    private IEnumerator GenerateMaze()
     {
         /*
          Generate Maze with Backtracking (from Wikipedia):
@@ -351,11 +372,12 @@ public class Maze : MonoBehaviour
 
 
         startTile = Grid[initY, initX];
-
+        startTile.MakeStartTile();
 
         int endY = Grid.GetLength(0) - 1;
         int endX = UnityEngine.Random.Range(0, Grid.GetLength(1));
         endTile = Grid[endY, endX];
+        endTile.MakeEndTile();
 
         // change the colour of the start and end tiles
 
@@ -454,7 +476,7 @@ public class Maze : MonoBehaviour
                         gridCodes[i, j] = mazeFile.ReadLine();
                     }
                 }
-                this.CreateGridFromCodes(gridCodes);
+                this.MakeGridFromCodes(gridCodes);
 
                 // set the start and end tile
             }
