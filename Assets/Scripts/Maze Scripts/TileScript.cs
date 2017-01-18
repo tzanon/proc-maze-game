@@ -109,14 +109,31 @@ public class TileScript : MonoBehaviour
     private void RemoveWall(Directions direction)
     {
         wallDirs[direction].gameObject.SetActive(false);
-        //if (walls.Remove(direction)) Debug.Log("wall successfully removed");
     }
 
     private void RemoveCorrespondingWall(Directions direction)
     {
         correspondingWallDirs[direction].gameObject.SetActive(false);
-        //Destroy(correspondingWallDirs[direction].gameObject);
-        //if (correspondingWalls.Remove(direction)) Debug.Log("wall successfully removed");
+    }
+
+    public bool WallsBetweenTilesExist(TileScript otherTile)
+    {
+        Directions direction;
+
+        Vector3 thisPos = this.transform.position;
+        Vector3 otherPos = otherTile.transform.position;
+
+        if (otherPos.x - thisPos.x > 0) direction = Directions.Right;
+        else if (otherPos.x - thisPos.x < 0) direction = Directions.Left;
+        else if (otherPos.y - thisPos.y > 0) direction = Directions.Up;
+        else if (otherPos.y - thisPos.y < 0) direction = Directions.Down;
+        else return true; // the two tiles must be the same
+
+        if (this.wallDirs[direction].gameObject.activeSelf
+            && otherTile.correspondingWallDirs[direction].gameObject.activeSelf)
+            return true;
+        else
+            return false;
     }
 
     public void Visit()

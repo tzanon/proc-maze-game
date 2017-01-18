@@ -5,12 +5,15 @@ using System;
 public class TestScript : MonoBehaviour {
 
     public Maze MazeTemplate;
+    public GameRunner RunnerTemplate;
     public Text StackSizeText;
     public Text UnvisitedTilesText;
+    public Text WinText;
     public InputField HeightSetter;
     public InputField WidthSetter;
 
-    Maze level;
+    private Maze level;
+    private GameRunner runner;
 
 	// Use this for initialization
 	void Start () {
@@ -24,11 +27,13 @@ public class TestScript : MonoBehaviour {
 	
     public void Generate()
     {
+        if (runner != null) return;
         level.StartGeneration();
     }
 
     public void Reset()
     {
+        if (runner != null) return;
         level.ResetGrid();
     }
 
@@ -39,11 +44,13 @@ public class TestScript : MonoBehaviour {
 	
     public void Destroy()
     {
+        if (runner != null) return;
         level.DestroyGrid();
     }
 
     public void UpdateGridDimensions()
     {
+        if (runner != null) return;
         int newHeight;
         int newWidth;
 
@@ -62,6 +69,21 @@ public class TestScript : MonoBehaviour {
         if (newWidth == level.Width) Debug.Log("No change in width");
 
         level.MakeBlankGrid(newHeight, newWidth);
+    }
+
+    public void PlayLevel()
+    {
+        if (runner != null || !level.Playable()) return;
+
+        runner = Instantiate(RunnerTemplate) as GameRunner;
+        runner.Level = level;
+        runner.WinText = WinText;
+    }
+
+    public void StopPlaying()
+    {
+        if (runner == null) return;
+        runner.EndGame();
     }
 
 }

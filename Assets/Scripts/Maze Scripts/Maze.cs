@@ -190,7 +190,7 @@ public class Maze : MonoBehaviour
         if (tile == null || !GridExists()) return false;
 
         foreach (TileScript gridTile in Grid)
-            if (gridTile == tile.gameObject) return true;
+            if (gridTile.gameObject == tile.gameObject) return true;
 
         return false;
     }
@@ -211,6 +211,14 @@ public class Maze : MonoBehaviour
     public bool Playable()
     {
         return (GridContains(startTile) && GridContains(endTile));
+    }
+
+    public void DisplayCoordinates()
+    {
+        foreach (TileScript tile in Grid)
+        {
+            Debug.Log("(" + tile.x + ", " + tile.y + ")");
+        }
     }
 
     #endregion
