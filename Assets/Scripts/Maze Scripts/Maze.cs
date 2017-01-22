@@ -6,6 +6,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
+/**
+ * GENERAL C# "CONVENTIONS:"
+ * PascalCase for public member variables (string MyName = "James")
+ * camelCase for local variables (string myName = "James")
+ * _leadingUnderscore for private member variables (string _myName = "James")
+ * 
+ */ 
+
 // a class to store information about a maze object
 public class Maze : MonoBehaviour
 {
@@ -43,8 +51,8 @@ public class Maze : MonoBehaviour
     public bool withDelay;
 
     // for constructing the grid in the scene
-    private const float startX = -8.25f;
-    private const float startY = -4f;
+    private const float _startX = -8.25f;
+    private const float _startY = -4f;
     private const float incr = 0.535f;
     private Vector2 position;
 
@@ -130,20 +138,20 @@ public class Maze : MonoBehaviour
         Debug.Log("new height is " + Height);
         Debug.Log("new width is " + Width);
 
-        position = new Vector2(startX, startY);
+        position = new Vector2(_startX, _startY);
 
         for (int i = 0; i < Height; i++)
         {
             for (int j = 0; j < Width; j++)
             {
                 TileScript newTile = Grid[i, j] = Instantiate(TileTemplate, position, Quaternion.identity) as TileScript;
-                newTile.x = j;
-                newTile.y = i;
+                newTile.X = j;
+                newTile.Y = i;
                 newTile.SetWallsFromCode(gridCodes[i, j]);
 
                 position.x += incr;
             }
-            position.x = startX;
+            position.x = _startX;
             position.y += incr;
         }
         // set start and end tile now
@@ -217,7 +225,7 @@ public class Maze : MonoBehaviour
     {
         foreach (TileScript tile in Grid)
         {
-            Debug.Log("(" + tile.x + ", " + tile.y + ")");
+            Debug.Log("(" + tile.X + ", " + tile.Y + ")");
         }
     }
 
@@ -396,8 +404,8 @@ public class Maze : MonoBehaviour
     public List<TileScript> GetUnvisitedNeighbours(TileScript currentTile)
     {
         List<TileScript> unvisitedNeighbours = new List<TileScript>();
-        int x = currentTile.x;
-        int y = currentTile.y;
+        int x = currentTile.X;
+        int y = currentTile.Y;
 
         if (InBounds(x + 1, y) && unvisitedTiles.Contains(Grid[y, x + 1])) unvisitedNeighbours.Add(Grid[y, x + 1]);
         if (InBounds(x - 1, y) && unvisitedTiles.Contains(Grid[y, x - 1])) unvisitedNeighbours.Add(Grid[y, x - 1]);

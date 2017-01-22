@@ -1,78 +1,51 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class TileScript : MonoBehaviour
-{
-
-    private SpriteRenderer spriteRenderer;
-    private float wallPos = 0.265f;
-    
-    private WallScript[] walls = new WallScript[4];
-
-    public Sprite startingSprite;
-    public Sprite visitedSprite;
-    public Sprite stackSprite;
-    public Sprite beginSprite;
-    public Sprite endSprite;
+public abstract class TileScript : MonoBehaviour {
 
     [HideInInspector]
-    public int x, y;
+    public int X, Y;
 
     public enum Directions { Up, Right, Down, Left, Centre };
 
-    public WallScript wall;
-    private Dictionary<Directions, WallScript> wallDirs = new Dictionary<Directions, WallScript>();
-    private Dictionary<Directions, WallScript> correspondingWallDirs = new Dictionary<Directions, WallScript>();
-    private Dictionary<Directions, Directions> correspondingDirs = new Dictionary<Directions, Directions>();
+    public WallScript WallTemplate;
 
-    private void Awake ()
+    protected WallScript[] _walls = new WallScript[4];
+    protected Dictionary<Directions, WallScript> _wallDirs = new Dictionary<Directions, WallScript>();
+    protected Dictionary<Directions, WallScript> _correspondingWallDirs = new Dictionary<Directions, WallScript>();
+    protected Dictionary<Directions, Directions> _correspondingDirs = new Dictionary<Directions, Directions>();
+
+    protected virtual void Awake()
     {
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        _correspondingDirs.Add(Directions.Up, Directions.Down);
+        _correspondingDirs.Add(Directions.Right, Directions.Left);
+        _correspondingDirs.Add(Directions.Down, Directions.Up);
+        _correspondingDirs.Add(Directions.Left, Directions.Right);
 
-        correspondingDirs.Add(Directions.Up, Directions.Down);
-        correspondingDirs.Add(Directions.Right, Directions.Left);
-        correspondingDirs.Add(Directions.Down, Directions.Up);
-        correspondingDirs.Add(Directions.Left, Directions.Right);
 
-        CreateWalls();
     }
 
-    private void InitWall(Directions dir, Vector3 offset, int rotation)
+    protected virtual void InitWall(Directions dir, Vector3 offset, Vector3 rotation)
     {
         int d = (int)dir;
 
-        walls[d] = Instantiate(wall, this.transform, false) as WallScript;
-        walls[d].transform.localPosition = offset;
-        walls[d].transform.localRotation = Quaternion.Euler(0, 0, rotation);
+        _walls[d] = Instantiate(WallTemplate, this.transform, false) as WallScript;
+        _walls[d].transform.localPosition = offset;
+        _walls[d].transform.localRotation = Quaternion.Euler(rotation);
 
-        wallDirs.Add(dir, walls[d]);
-        correspondingWallDirs.Add(correspondingDirs[dir], walls[d]);
+        _wallDirs.Add(dir, _walls[d]);
+        _correspondingWallDirs.Add(_correspondingDirs[dir], _walls[d]);
     }
 
-    private void CreateWalls()
-    {
-        wallDirs.Clear();
-        correspondingWallDirs.Clear();
-
-        WallScript upWall = walls[(int)Directions.Up];
-        WallScript rightWall = walls[(int)Directions.Right];
-        WallScript downWall = walls[(int)Directions.Down];
-        WallScript leftWall = walls[(int)Directions.Left];
-
-        InitWall(Directions.Up, new Vector3(0, wallPos, 0), 0);
-        InitWall(Directions.Right, new Vector3(wallPos, 0, 0), 90);
-        InitWall(Directions.Down, new Vector3(0, -wallPos, 0), 0);
-        InitWall(Directions.Left, new Vector3(-wallPos, 0, 0), 90);
-
-    }
+    protected abstract void CreateWalls();
 
     public string GetWallCode()
     {
         string code = "";
 
-        for (int i = 0; i < walls.Length; i++)
+        for (int i = 0; i < _walls.Length; i++)
         {
-            if (walls[i].gameObject.activeSelf) code += '1';
+            if (_walls[i].gameObject.activeSelf) code += '1';
             else code += '0';
         }
 
@@ -81,10 +54,10 @@ public class TileScript : MonoBehaviour
 
     public void SetWallsFromCode(string code)
     {
-        for (int i = 0; i < walls.Length; i++)
+        for (int i = 0; i < _walls.Length; i++)
         {
-            if (code[i] == '1') walls[i].gameObject.SetActive(true);
-            else walls[i].gameObject.SetActive(false);
+            if (code[i] == '1') _walls[i].gameObject.SetActive(true);
+            else _walls[i].gameObject.SetActive(false);
         }
     }
 
@@ -106,14 +79,14 @@ public class TileScript : MonoBehaviour
 
     }
 
-    private void RemoveWall(Directions direction)
+    protected void RemoveWall(Directions direction)
     {
-        wallDirs[direction].gameObject.SetActive(false);
+        _wallDirs[direction].gameObject.SetActive(false);
     }
 
-    private void RemoveCorrespondingWall(Directions direction)
+    protected void RemoveCorrespondingWall(Directions direction)
     {
-        correspondingWallDirs[direction].gameObject.SetActive(false);
+        _correspondingWallDirs[direction].gameObject.SetActive(false);
     }
 
     public bool WallsBetweenTilesExist(TileScript otherTile)
@@ -129,36 +102,11 @@ public class TileScript : MonoBehaviour
         else if (otherPos.y - thisPos.y < 0) direction = Directions.Down;
         else return true; // the two tiles must be the same
 
-        if (this.wallDirs[direction].gameObject.activeSelf
-            && otherTile.correspondingWallDirs[direction].gameObject.activeSelf)
+        if (this._wallDirs[direction].gameObject.activeSelf
+            && otherTile._correspondingWallDirs[direction].gameObject.activeSelf)
             return true;
         else
             return false;
-    }
-
-    public void Visit()
-    {
-        spriteRenderer.sprite = visitedSprite;
-    }
-
-    public void OnStack()
-    {
-        spriteRenderer.sprite = stackSprite;
-    }
-
-    public void UnVisit()
-    {
-        spriteRenderer.sprite = startingSprite;
-    }
-
-    public void MakeStartTile()
-    {
-        spriteRenderer.sprite = beginSprite;
-    }
-
-    public void MakeEndTile()
-    {
-        spriteRenderer.sprite = endSprite;
     }
 
     public void ResetTile()
@@ -166,6 +114,15 @@ public class TileScript : MonoBehaviour
         SetWallsFromCode("1111");
     }
 
-    
+
+    public abstract void Visit();
+
+    public abstract void OnStack();
+
+    public abstract void UnVisit();
+
+    public abstract void MakeStartTile();
+
+    public abstract void MakeEndTile();
 
 }

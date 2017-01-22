@@ -81,8 +81,8 @@ public class GameRunner : MonoBehaviour
     private void UpdatePlayerPosition(TileScript tile)
     {
         //Debug.Log("Current position: " + Player.x + ", " + Player.y);
-        Player.x = tile.x;
-        Player.y = tile.y;
+        Player.x = tile.X;
+        Player.y = tile.Y;
         Player.transform.position = tile.transform.position;
         //Debug.Log("New position: " + Player.x + ", " + Player.y);
         if (tile == Level.endTile)

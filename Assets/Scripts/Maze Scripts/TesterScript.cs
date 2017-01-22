@@ -3,7 +3,7 @@ using System.Collections;
 
 public class TesterScript : MonoBehaviour {
 
-    public TileScript leftTile, rightTile;
+    public TileScript2D leftTile, rightTile;
 
 	void Start ()
     {
