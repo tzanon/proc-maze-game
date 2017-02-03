@@ -15,14 +15,25 @@ public abstract class TileScript : MonoBehaviour {
     protected Dictionary<Directions, WallScript> _correspondingWallDirs = new Dictionary<Directions, WallScript>();
     protected Dictionary<Directions, Directions> _correspondingDirs = new Dictionary<Directions, Directions>();
 
+    public abstract Vector3 StartingPosition
+    {
+        get;
+    }
+    public abstract Vector3 HorizontalSpawnIncrement
+    {
+        get;
+    }
+    public abstract Vector3 VerticalSpawnIncrement
+    {
+        get;
+    }
+
     protected virtual void Awake()
     {
         _correspondingDirs.Add(Directions.Up, Directions.Down);
         _correspondingDirs.Add(Directions.Right, Directions.Left);
         _correspondingDirs.Add(Directions.Down, Directions.Up);
         _correspondingDirs.Add(Directions.Left, Directions.Right);
-
-
     }
 
     protected virtual void InitWall(Directions dir, Vector3 offset, Vector3 rotation)

@@ -11,16 +11,37 @@ public class TileScript3D : TileScript {
     public Material BeginMaterial;
     public Material EndMaterial;
 
-    private float _xWallPos, _yWallPos;
+    private const float _xWallPos = 0.45f, _yWallPos = 9.5f;
+
+    public override Vector3 StartingPosition
+    {
+        get
+        {
+            return Vector3.zero;
+        }
+    }
+    public override Vector3 HorizontalSpawnIncrement
+    {
+        get
+        {
+            return new Vector3(1.8f, 0, 0);
+        }
+    }
+    public override Vector3 VerticalSpawnIncrement
+    {
+        get
+        {
+            return new Vector3(0, 0, 1.8f);
+        }
+    }
 
     protected override void Awake()
     {
         base.Awake();
-        _xWallPos = 0.525f;
-        _yWallPos = 9.5f;
         _meshRenderer = GetComponent<MeshRenderer>();
         _meshRenderer.material = StartingMaterial;
 
+        CreateWalls();
     }
 
     protected override void CreateWalls()

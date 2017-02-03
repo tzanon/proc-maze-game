@@ -51,10 +51,10 @@ public class Maze : MonoBehaviour
     public bool withDelay;
 
     // for constructing the grid in the scene
-    private const float _startX = -8.25f;
-    private const float _startY = -4f;
-    private const float incr = 0.535f;
-    private Vector2 position;
+    //private const float _startX = -8.25f;
+    //private const float _startY = -4f;
+    //private Vector3 incr;
+    //private Vector2 position;
 
     #region generation variables
 
@@ -83,7 +83,7 @@ public class Maze : MonoBehaviour
     {
         MakeBlankGrid(minHeight, minWidth);
 
-        StartGeneration();
+        //StartGeneration();
     }
 
     public void MakeMedMaze()
@@ -138,7 +138,9 @@ public class Maze : MonoBehaviour
         Debug.Log("new height is " + Height);
         Debug.Log("new width is " + Width);
 
-        position = new Vector2(_startX, _startY);
+        Vector3 position = TileTemplate.StartingPosition;
+        Vector3 xIncr = TileTemplate.HorizontalSpawnIncrement;
+        Vector3 yIncr = TileTemplate.VerticalSpawnIncrement;
 
         for (int i = 0; i < Height; i++)
         {
@@ -149,10 +151,10 @@ public class Maze : MonoBehaviour
                 newTile.Y = i;
                 newTile.SetWallsFromCode(gridCodes[i, j]);
 
-                position.x += incr;
+                position += xIncr;
             }
-            position.x = _startX;
-            position.y += incr;
+            position.x = TileTemplate.StartingPosition.x;
+            position += yIncr;
         }
         // set start and end tile now
     }

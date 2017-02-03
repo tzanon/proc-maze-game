@@ -2,7 +2,8 @@
 using UnityEngine.UI;
 using System;
 
-public class TestScript : MonoBehaviour {
+public class TestScript : MonoBehaviour
+{
 
     public Maze MazeTemplate;
     public GameRunner RunnerTemplate;

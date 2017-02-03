@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 public class TileScript2D : TileScript
 {
@@ -13,17 +14,27 @@ public class TileScript2D : TileScript
 
     private float _wallPos;
 
-    /*
-    public enum Directions { Up, Right, Down, Left, Centre };
-
-    public WallScript WallTemplate;
-    private float _wallPos = 0.265f;
-
-    private WallScript[] _walls = new WallScript[4];
-    private Dictionary<Directions, WallScript> _wallDirs = new Dictionary<Directions, WallScript>();
-    private Dictionary<Directions, WallScript> _correspondingWallDirs = new Dictionary<Directions, WallScript>();
-    private Dictionary<Directions, Directions> _correspondingDirs = new Dictionary<Directions, Directions>();
-    */
+    public override Vector3 StartingPosition
+    {
+        get
+        {
+            return new Vector3(-8.25f, -4f, 0);
+        }
+    }
+    public override Vector3 HorizontalSpawnIncrement
+    {
+        get
+        {
+            return new Vector3(0.535f, 0, 0);
+        }
+    }
+    public override Vector3 VerticalSpawnIncrement
+    {
+        get
+        {
+            return new Vector3(0, 0.535f, 0);
+        }
+    }
 
     protected override void Awake ()
     {
