@@ -13,6 +13,8 @@ public class PlayInitializer : MonoBehaviour
     public Text StackSizeText;
     public Text UnvisitedTilesText;
 
+    public Camera TopViewCam;
+
     private PlayLevelManager manager;
     private Maze level;
     private GameRunner runner;
@@ -24,13 +26,52 @@ public class PlayInitializer : MonoBehaviour
     void Start()
     {
         level = Instantiate(MazeTemplate) as Maze;
-        //TileScript3D newTile = Instantiate(TileTemplate, Vector3.zero, Quaternion.identity) as TileScript3D;
-        level.MakeBlankGrid(6, 6);
+        level.withDelay = true;
+
+        level.MakeBlankGrid(30, 30);
         //level.stackCount = StackSizeText;
         //level.setCount = UnvisitedTilesText;
 
+        RepositionTopViewCam();
+
         level.PrepareForGeneration();
-        //level.StartGeneration();
+        level.StartGeneration();
+    }
+
+    private void RepositionTopViewCam()
+    {
+        TileScript[,] grid = level.Grid;
+
+        float camX = (grid[0, 0].transform.position.x +
+            grid[0, grid.GetLength(1) - 1].transform.position.x) / 2;
+
+        float camZ = (grid[0, 0].transform.position.z +
+            grid[grid.GetLength(0) - 1, 0].transform.position.z) / 2;
+
+        float gridSize = Mathf.Max(grid.GetLength(0), grid.GetLength(1));
+
+        TopViewCam.transform.position = new Vector3(camX, 3 * gridSize, camZ);
+        TopViewCam.orthographicSize = gridSize;
+        
+    }
+
+    private void TestTiles()
+    {
+        TileScript3D downTile = Instantiate(TileTemplate, Vector3.zero, Quaternion.identity) as TileScript3D;
+        downTile.X = 0; downTile.Y = 0;
+
+        TileScript3D upTile = Instantiate(TileTemplate, new Vector3(0, 0, 3), Quaternion.identity) as TileScript3D;
+        upTile.X = 0; upTile.Y = 1;
+
+        TileScript3D rightTile = Instantiate(TileTemplate, new Vector3(3, 0, 0), Quaternion.identity) as TileScript3D;
+        rightTile.X = 1; rightTile.Y = 0;
+
+        TileScript3D leftTile = Instantiate(TileTemplate, new Vector3(-3, 0, 0), Quaternion.identity) as TileScript3D;
+        leftTile.X = -1; leftTile.Y = 0;
+
+        upTile.RemoveWallsBetweenTiles(downTile);
+        downTile.RemoveWallsBetweenTiles(leftTile);
+        downTile.RemoveWallsBetweenTiles(rightTile);
     }
 
     public void Generate()

@@ -61,7 +61,7 @@ public class Maze : MonoBehaviour
     public Text stackCount;
     public Text setCount;
 
-    private const float delay = 0.05f; // delay for "animation"
+    private const float delay = 0.025f; // delay for "animation"
     private bool isGenerating;
     private Stack<TileScript> tileStack = new Stack<TileScript>();
     private HashSet<TileScript> unvisitedTiles = new HashSet<TileScript>();

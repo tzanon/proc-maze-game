@@ -54,36 +54,36 @@ public class TileScript3D : TileScript {
         WallScript downWall = _walls[(int)Directions.Down];
         WallScript leftWall = _walls[(int)Directions.Left];
 
-        InitWall(Directions.Up,    new Vector3( _xWallPos,  _yWallPos,          0), new Vector3(90, 90, 0));
-        InitWall(Directions.Right, new Vector3(         0,  _yWallPos, -_xWallPos), new Vector3(90, 0, 0));
-        InitWall(Directions.Down,  new Vector3(-_xWallPos,  _yWallPos,          0), new Vector3(90, 90, 0));
-        InitWall(Directions.Left,  new Vector3(         0,  _yWallPos,  _xWallPos), new Vector3(90, 0, 0));
+        InitWall(Directions.Up,    new Vector3(         0,  _yWallPos,  _xWallPos), new Vector3(90, 0, 0));
+        InitWall(Directions.Right, new Vector3( _xWallPos,  _yWallPos,          0), new Vector3(90, 90, 0));
+        InitWall(Directions.Down,  new Vector3(         0,  _yWallPos, -_xWallPos), new Vector3(90, 0, 0));
+        InitWall(Directions.Left,  new Vector3(-_xWallPos,  _yWallPos,          0), new Vector3(90, 90, 0));
 
     }
 
     public override void Visit()
     {
-        
+        _meshRenderer.material = VisitedMaterial;
     }
 
     public override void OnStack()
     {
-
+        _meshRenderer.material = StackMaterial;
     }
 
     public override void UnVisit()
     {
-
+        _meshRenderer.material = StartingMaterial;
     }
 
     public override void MakeStartTile()
     {
-
+        _meshRenderer.material = BeginMaterial;
     }
 
     public override void MakeEndTile()
     {
-
+        _meshRenderer.material = EndMaterial;
     }
 
 }

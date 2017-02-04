@@ -79,10 +79,10 @@ public abstract class TileScript : MonoBehaviour {
         Vector3 thisPos = this.transform.position;
         Vector3 otherPos = otherTile.transform.position;
 
-        if (otherPos.x - thisPos.x > 0) direction = Directions.Right;
-        else if (otherPos.x - thisPos.x < 0) direction = Directions.Left;
-        else if (otherPos.y - thisPos.y > 0) direction = Directions.Up;
-        else if (otherPos.y - thisPos.y < 0) direction = Directions.Down;
+        if      (otherTile.X - this.X > 0) direction = Directions.Right;
+        else if (otherTile.X - this.X < 0) direction = Directions.Left;
+        else if (otherTile.Y - this.Y > 0) direction = Directions.Up;
+        else if (otherTile.Y - this.Y < 0) direction = Directions.Down;
         else return; // the two tiles must be the same
 
         this.RemoveWall(direction);
@@ -107,10 +107,10 @@ public abstract class TileScript : MonoBehaviour {
         Vector3 thisPos = this.transform.position;
         Vector3 otherPos = otherTile.transform.position;
 
-        if (otherPos.x - thisPos.x > 0) direction = Directions.Right;
-        else if (otherPos.x - thisPos.x < 0) direction = Directions.Left;
-        else if (otherPos.y - thisPos.y > 0) direction = Directions.Up;
-        else if (otherPos.y - thisPos.y < 0) direction = Directions.Down;
+        if      (otherTile.X - this.X > 0) direction = Directions.Right;
+        else if (otherTile.X - this.X < 0) direction = Directions.Left;
+        else if (otherTile.Y - this.Y > 0) direction = Directions.Up;
+        else if (otherTile.Y - this.Y < 0) direction = Directions.Down;
         else return true; // the two tiles must be the same
 
         if (this._wallDirs[direction].gameObject.activeSelf
