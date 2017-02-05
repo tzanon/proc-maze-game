@@ -220,7 +220,7 @@ public class Maze : MonoBehaviour
     // maze is playable only if its start and end tiles are defined
     public bool Playable()
     {
-        return (GridContains(startTile) && GridContains(endTile));
+        return (!isGenerating && GridContains(startTile) && GridContains(endTile));
     }
 
     public void DisplayCoordinates()

@@ -8,6 +8,7 @@ public class PlayInitializer3D : MonoBehaviour
     public TileScript3D TileTemplate;
     public PlayerController3D PlayerTemplate;
 
+    public Canvas Display;
     public Text WinText;
     public InputField HeightSetter;
     public InputField WidthSetter;
@@ -151,6 +152,7 @@ public class PlayInitializer3D : MonoBehaviour
     public void PlayLevel()
     {
         if (runner != null || !level.Playable()) return;
+        Display.gameObject.SetActive(false);
         TopViewCam.enabled = false;
         runner = Instantiate(RunnerTemplate) as GameRunner3D;
         runner.Level = level;
@@ -160,6 +162,7 @@ public class PlayInitializer3D : MonoBehaviour
     public void StopPlaying()
     {
         if (runner == null) return;
+        Display.gameObject.SetActive(true);
         runner.EndGame();
         TopViewCam.enabled = true;
     }
