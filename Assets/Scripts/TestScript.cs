@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System;
 
 public class TestScript : MonoBehaviour
 {
 
     public Maze MazeTemplate;
-    public GameRunner RunnerTemplate;
+    public GameRunner2D RunnerTemplate;
+
     public Text StackSizeText;
     public Text UnvisitedTilesText;
     public Text WinText;
@@ -14,7 +14,7 @@ public class TestScript : MonoBehaviour
     public InputField WidthSetter;
 
     private Maze level;
-    private GameRunner runner;
+    private GameRunner2D runner;
 
 	// Use this for initialization
 	void Start () {
@@ -76,7 +76,7 @@ public class TestScript : MonoBehaviour
     {
         if (runner != null || !level.Playable()) return;
 
-        runner = Instantiate(RunnerTemplate) as GameRunner;
+        runner = Instantiate(RunnerTemplate) as GameRunner2D;
         runner.Level = level;
         runner.WinText = WinText;
     }

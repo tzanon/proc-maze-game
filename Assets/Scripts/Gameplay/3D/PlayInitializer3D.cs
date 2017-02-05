@@ -1,41 +1,69 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayInitializer : MonoBehaviour
+public class PlayInitializer3D : MonoBehaviour
 {
-
     public Maze MazeTemplate;
-    public GameRunner RunnerTemplate;
+    public GameRunner3D RunnerTemplate;
     public TileScript3D TileTemplate;
+    public PlayerController3D PlayerTemplate;
 
+    public Text WinText;
     public InputField HeightSetter;
     public InputField WidthSetter;
     public Text StackSizeText;
     public Text UnvisitedTilesText;
 
-    public Camera TopViewCam;
-
+    [SerializeField]
+    private Camera TopViewCam;
+    private Camera playerCamera;
+    private PlayerController3D player;
     private PlayLevelManager manager;
     private Maze level;
-    private GameRunner runner;
+    private GameRunner3D runner;
     private string filename;
 
     private TileScript3D[,] testGrid;
+    private Camera[] cameras;
+    private int cameraIndex;
 
     // Use this for initialization
-    void Start()
+    private void Start()
     {
         level = Instantiate(MazeTemplate) as Maze;
         level.withDelay = true;
 
-        level.MakeBlankGrid(30, 30);
-        //level.stackCount = StackSizeText;
-        //level.setCount = UnvisitedTilesText;
+        /*
+        player = Instantiate(PlayerTemplate, new Vector3(-12, 1, 0), Quaternion.identity) as PlayerController3D;
+        playerCamera = player.GetComponent<Camera>();
 
+        TopViewCam.enabled = true;
+        playerCamera.enabled = false;
+        */
+
+        level.MakeBlankGrid(15, 15);
+
+        level.stackCount = StackSizeText;
+        level.setCount = UnvisitedTilesText;
+        
         RepositionTopViewCam();
 
         level.PrepareForGeneration();
-        level.StartGeneration();
+        
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            //CycleCameras();
+        }
+    }
+
+    private void CycleCameras()
+    {
+        TopViewCam.enabled = !TopViewCam.enabled;
+        playerCamera.enabled = !playerCamera.enabled;
     }
 
     private void RepositionTopViewCam()
@@ -51,8 +79,8 @@ public class PlayInitializer : MonoBehaviour
         float gridSize = Mathf.Max(grid.GetLength(0), grid.GetLength(1));
 
         TopViewCam.transform.position = new Vector3(camX, 3 * gridSize, camZ);
+        TopViewCam.transform.rotation = Quaternion.Euler(90, 0, 0);
         TopViewCam.orthographicSize = gridSize;
-        
     }
 
     private void TestTiles()
@@ -119,13 +147,12 @@ public class PlayInitializer : MonoBehaviour
 
         level.MakeBlankGrid(newHeight, newWidth);
     }
-
-    /*
+    
     public void PlayLevel()
     {
         if (runner != null || !level.Playable()) return;
-
-        runner = Instantiate(RunnerTemplate) as GameRunner;
+        TopViewCam.enabled = false;
+        runner = Instantiate(RunnerTemplate) as GameRunner3D;
         runner.Level = level;
         runner.WinText = WinText;
     }
@@ -134,6 +161,7 @@ public class PlayInitializer : MonoBehaviour
     {
         if (runner == null) return;
         runner.EndGame();
+        TopViewCam.enabled = true;
     }
-    */
+
 }

@@ -2,14 +2,12 @@
 using System.Collections;
 using UnityEngine.UI;
 
-public class GameRunner : MonoBehaviour
-{
-    
-    private Text _winText;
-    private Maze _level;
-    private TileScript[,] grid;
+public abstract class GameRunner : MonoBehaviour {
 
-    private PlayerController Player;
+    protected Text _winText;
+    protected Maze _level;
+    protected TileScript[,] _grid;
+    protected PlayerController _player;
 
     public Maze Level
     {
@@ -21,7 +19,7 @@ public class GameRunner : MonoBehaviour
             else
             {
                 _level = value;
-                grid = value.Grid;
+                _grid = value.Grid;
             }
         }
     }
@@ -35,76 +33,39 @@ public class GameRunner : MonoBehaviour
             _winText.gameObject.SetActive(false);
         }
     }
+    public PlayerController Player
+    {
+        get { return _player; }
+        protected set { _player = value; }
+    }
 
     // Use this for initialization
-    void Start()
+    protected virtual void Start ()
     {
         Debug.Log("start tile is " + Level.startTile);
-        Player = Instantiate(PlayerTemplate) as PlayerController;
-        UpdatePlayerPosition(Level.startTile);
+        _player = Instantiate(PlayerTemplate) as PlayerController;
+        PlacePlayer();
+    }
+	
+	// Update is called once per frame
+	void Update () {
+	    
 	}
 
-	// Handle player input
-	void Update()
-    {
-        int currentX = Player.x;
-        int currentY = Player.y;
-
-	    if (Input.GetKeyDown(KeyCode.UpArrow))
-        {
-            TakeInput(KeyCode.UpArrow, currentX, currentY + 1);
-        }
-        if (Input.GetKeyDown(KeyCode.DownArrow))
-        {
-            TakeInput(KeyCode.DownArrow, currentX, currentY - 1);
-        }
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            TakeInput(KeyCode.LeftArrow, currentX - 1, currentY);
-        }
-        if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            TakeInput(KeyCode.RightArrow, currentX + 1, currentY);
-        }
-
-    }
-
-    private void TakeInput(KeyCode key, int newX, int newY)
-    {
-        if (Level.InBounds(newX, newY) &&
-            !grid[Player.y, Player.x].WallsBetweenTilesExist(grid[newY, newX]))
-        {
-            UpdatePlayerPosition(grid[newY, newX]);
-        }
-    }
-
-    private void UpdatePlayerPosition(TileScript tile)
-    {
-        //Debug.Log("Current position: " + Player.x + ", " + Player.y);
-        Player.x = tile.X;
-        Player.y = tile.Y;
-        Player.transform.position = tile.transform.position;
-        //Debug.Log("New position: " + Player.x + ", " + Player.y);
-        if (tile == Level.endTile)
-        {
-            Debug.Log("Maze solved!");
-            GameWon();
-        }
-    }
+    protected abstract void PlacePlayer();
 
     public void GameWon()
     {
-        // display win text
         StartCoroutine(DisplayWon());
     }
 
-    public void EndGame()
+    public virtual void EndGame()
     {
-        Destroy(Player.gameObject);
+        Destroy(_player.gameObject);
         Destroy(this.gameObject);
     }
 
-    private IEnumerator DisplayWon()
+    protected IEnumerator DisplayWon()
     {
         WinText.gameObject.SetActive(true);
         yield return new WaitForSeconds(3);
