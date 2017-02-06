@@ -9,6 +9,8 @@ public abstract class GameRunner : MonoBehaviour {
     protected TileScript[,] _grid;
     protected PlayerController _player;
 
+    
+
     public Maze Level
     {
         get { return _level; }
