@@ -7,9 +7,19 @@ public abstract class GameRunner : MonoBehaviour {
     protected Text _winText;
     protected Maze _level;
     protected TileScript[,] _grid;
-    protected PlayerController _player;
+    private PlayerController _player;
+    private TileScript _endTile;
+    private DestinationScript _destination;
 
-    
+    public DestinationScript Destination
+    {
+        get { return _destination; }
+        protected set { _destination = value; }
+    }
+
+
+    public PlayerController PlayerTemplate;
+    public DestinationScript DestTemplate;
 
     public Maze Level
     {
@@ -25,7 +35,6 @@ public abstract class GameRunner : MonoBehaviour {
             }
         }
     }
-    public PlayerController PlayerTemplate;
     public Text WinText
     {
         get { return _winText; }
@@ -40,12 +49,19 @@ public abstract class GameRunner : MonoBehaviour {
         get { return _player; }
         protected set { _player = value; }
     }
+    public TileScript EndTile
+    {
+        get { return _endTile; }
+        protected set { _endTile = value; }
+    }
 
     // Use this for initialization
     protected virtual void Start ()
     {
         Debug.Log("start tile is " + Level.startTile);
-        _player = Instantiate(PlayerTemplate) as PlayerController;
+        Player = Instantiate(PlayerTemplate) as PlayerController;
+        EndTile = Level.endTile;
+        PlaceDestintation();
         PlacePlayer();
     }
 	
@@ -56,6 +72,8 @@ public abstract class GameRunner : MonoBehaviour {
 
     protected abstract void PlacePlayer();
 
+    protected abstract void PlaceDestintation();
+
     public void GameWon()
     {
         StartCoroutine(DisplayWon());
@@ -63,8 +81,8 @@ public abstract class GameRunner : MonoBehaviour {
 
     public virtual void EndGame()
     {
-        Destroy(_player.gameObject);
-        Destroy(this.gameObject);
+        Destroy(Player.gameObject);
+        Destroy(Destination);
     }
 
     protected IEnumerator DisplayWon()

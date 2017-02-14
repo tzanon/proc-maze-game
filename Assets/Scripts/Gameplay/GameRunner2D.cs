@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using System;
 
 public class GameRunner2D : GameRunner
 {
@@ -14,8 +15,8 @@ public class GameRunner2D : GameRunner
 	// Handle player input
 	void Update()
     {
-        int currentX = _player.x;
-        int currentY = _player.y;
+        int currentX = Player.x;
+        int currentY = Player.y;
 
 	    if (Input.GetKeyDown(KeyCode.UpArrow))
         {
@@ -41,10 +42,16 @@ public class GameRunner2D : GameRunner
         UpdatePlayerPosition(Level.startTile);
     }
 
+    protected override void PlaceDestintation()
+    {
+        Destination = Instantiate(DestTemplate, EndTile.transform.position, Quaternion.identity) as DestinationScript;
+        Destination.transform.parent = EndTile.transform;
+    }
+
     private void TakeInput(KeyCode key, int newX, int newY)
     {
         if (Level.InBounds(newX, newY) &&
-            !_grid[_player.y, _player.x].WallsBetweenTilesExist(_grid[newY, newX]))
+            !_grid[Player.y, Player.x].WallsBetweenTilesExist(_grid[newY, newX]))
         {
             UpdatePlayerPosition(_grid[newY, newX]);
         }
@@ -53,9 +60,9 @@ public class GameRunner2D : GameRunner
     private void UpdatePlayerPosition(TileScript tile)
     {
         //Debug.Log("Current position: " + Player.x + ", " + Player.y);
-        _player.x = tile.X;
-        _player.y = tile.Y;
-        _player.transform.position = tile.transform.position;
+        Player.x = tile.X;
+        Player.y = tile.Y;
+        Player.transform.position = tile.transform.position;
         //Debug.Log("New position: " + Player.x + ", " + Player.y);
         if (tile == Level.endTile)
         {

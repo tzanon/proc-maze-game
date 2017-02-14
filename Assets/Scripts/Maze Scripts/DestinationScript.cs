@@ -1,12 +1,11 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class DestinationScript : MonoBehaviour {
 
+    [HideInInspector]
     public Maze Level;
+    [HideInInspector]
     public GameRunner3D Runner;
-    public TileScript Tile;
-
 
 	// Use this for initialization
 	void Start ()
@@ -21,7 +20,10 @@ public class DestinationScript : MonoBehaviour {
 
     void OnTriggerEnter(Collider coll)
     {
-        Runner.EndGame();
+        if (coll.tag == "Player")
+        {
+            Runner.EndGame();
+        }
     }
 
 

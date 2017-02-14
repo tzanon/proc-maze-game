@@ -12,7 +12,7 @@ using System.Linq;
  * camelCase for local variables (string myName = "James")
  * _leadingUnderscore for private member variables (string _myName = "James")
  * 
- */ 
+ */
 
 // a class to store information about a maze object
 public class Maze : MonoBehaviour
@@ -168,7 +168,7 @@ public class Maze : MonoBehaviour
         {
             for (int j = 0; j < Grid.GetLength(1); j++)
             {
-                if (Grid[i,j] != null) Destroy(Grid[i, j].gameObject);
+                if (Grid[i, j] != null) Destroy(Grid[i, j].gameObject);
             }
         }
 
@@ -261,7 +261,7 @@ public class Maze : MonoBehaviour
                 Grid[i, j].ResetTile();
             }
         }
-        
+
         PrepareForGeneration();
     }
 
@@ -396,7 +396,7 @@ public class Maze : MonoBehaviour
         int endX = UnityEngine.Random.Range(0, Grid.GetLength(1));
         endTile = Grid[endY, endX];
         endTile.MakeEndTile();
-
+        
         // change the colour of the start and end tiles
 
         isGenerating = false;

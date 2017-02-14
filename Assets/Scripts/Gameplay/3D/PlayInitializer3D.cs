@@ -147,15 +147,17 @@ public class PlayInitializer3D : MonoBehaviour
         if (newWidth == level.Width) Debug.Log("No change in width");
 
         level.MakeBlankGrid(newHeight, newWidth);
+        RepositionTopViewCam();
     }
     
     public void PlayLevel()
     {
-        if (runner != null || !level.Playable()) return;
+        if (!level.Playable()) return;
         Display.gameObject.SetActive(false);
         TopViewCam.enabled = false;
         runner = Instantiate(RunnerTemplate) as GameRunner3D;
         runner.Level = level;
+        runner.initializer = this;
         runner.WinText = WinText;
     }
 
@@ -163,8 +165,9 @@ public class PlayInitializer3D : MonoBehaviour
     {
         if (runner == null) return;
         Display.gameObject.SetActive(true);
-        runner.EndGame();
+        //runner.EndGame();
         TopViewCam.enabled = true;
+        Destroy(runner.gameObject);
     }
 
 }
