@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System;
 
 public class GameRunner3D : GameRunner {
 
@@ -9,18 +7,13 @@ public class GameRunner3D : GameRunner {
 
     private const float _actorHeight = 1f;
 
-    // Use this for initialization
     protected override void Start ()
     {
         base.Start();
         Player.GetComponent<Camera>().enabled = true;
     }
 
-    // Update is called once per frame
-    void Update ()
-    {
-	    
-	}
+    
 
     protected override void PlacePlayer()
     {

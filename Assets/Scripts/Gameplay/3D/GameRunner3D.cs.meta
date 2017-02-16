@@ -1,10 +1,15 @@
 fileFormatVersion: 2
 guid: 2a5fa959a22eee441ad463093fc40bb1
-timeCreated: 1486273944
+timeCreated: 1487197919
 licenseType: Free
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - PlayerTemplate: {fileID: 114000012386993994, guid: 4cd6978ddc77a254b82d4a95457c6d91,
+      type: 2}
+  - DestTemplate: {fileID: 114000010640731796, guid: 6e560b96eb6c60442a15e87c95a3ff01,
+      type: 2}
+  - initializer: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

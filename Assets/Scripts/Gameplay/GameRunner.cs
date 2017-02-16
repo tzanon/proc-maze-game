@@ -17,7 +17,6 @@ public abstract class GameRunner : MonoBehaviour {
         protected set { _destination = value; }
     }
 
-
     public PlayerController PlayerTemplate;
     public DestinationScript DestTemplate;
 
@@ -55,7 +54,6 @@ public abstract class GameRunner : MonoBehaviour {
         protected set { _endTile = value; }
     }
 
-    // Use this for initialization
     protected virtual void Start ()
     {
         Debug.Log("start tile is " + Level.startTile);
@@ -64,11 +62,15 @@ public abstract class GameRunner : MonoBehaviour {
         PlaceDestintation();
         PlacePlayer();
     }
-	
-	// Update is called once per frame
-	void Update () {
-	    
-	}
+    
+	protected virtual void Update ()
+    {
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            Debug.Log("quitting...");
+            EndGame();
+        }
+    }
 
     protected abstract void PlacePlayer();
 

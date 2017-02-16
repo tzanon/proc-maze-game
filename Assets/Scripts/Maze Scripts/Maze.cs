@@ -46,7 +46,7 @@ public class Maze : MonoBehaviour
 
     [HideInInspector]
     public const int minHeight = 6, minWidth = 6,
-        maxHeight = 16, maxWidth = 32;
+        maxHeight = 32, maxWidth = 32;
 
     public bool withDelay;
 
