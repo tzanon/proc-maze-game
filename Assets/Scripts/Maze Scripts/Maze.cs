@@ -45,8 +45,7 @@ public class Maze : MonoBehaviour
     }
 
     [HideInInspector]
-    public const int minHeight = 6, minWidth = 6,
-        maxHeight = 32, maxWidth = 32;
+    public const int minHeight = 6, minWidth = 6, maxHeight = 32, maxWidth = 32;
 
     public bool withDelay;
 
@@ -179,7 +178,6 @@ public class Maze : MonoBehaviour
         // update GUI display
         UpdateStackCount();
         UpdateUnvisitedTiles();
-
     }
 
     // determines if the given coordinates are within the grid's bounds
@@ -232,7 +230,6 @@ public class Maze : MonoBehaviour
     }
 
     #endregion
-
 
     #region maze generation methods
 
@@ -352,7 +349,6 @@ public class Maze : MonoBehaviour
 
                 currentTile.RemoveWallsBetweenTiles(neighbourTile);
 
-
                 currentTile = neighbourTile;
                 unvisitedTiles.Remove(currentTile);
                 UpdateUnvisitedTiles();
@@ -388,17 +384,29 @@ public class Maze : MonoBehaviour
         if (withDelay) yield return new WaitForSeconds(delay);
         currentTile.Visit();
 
-
         startTile = Grid[initY, initX];
         startTile.MakeStartTile();
 
+        // select some random tile at the last row for end tile
         int endY = Grid.GetLength(0) - 1;
         int endX = UnityEngine.Random.Range(0, Grid.GetLength(1));
+
+        // select a tile in the 1st or 2nd last rows with 3 walls for end tile
+        for (int i = Grid.GetLength(0) - 2; i < Grid.GetLength(0); i++)
+        {
+            for (int j = 0; j < Grid.GetLength(1); j++)
+            {
+                if (Grid[i,j].GetNumActiveWalls() == 3)
+                {
+                    endY = i;
+                    endX = j;
+                }
+            }
+        }
+        
         endTile = Grid[endY, endX];
         endTile.MakeEndTile();
         
-        // change the colour of the start and end tiles
-
         isGenerating = false;
     }
 
@@ -420,24 +428,26 @@ public class Maze : MonoBehaviour
 
     #endregion
 
-
     #region file IO methods
 
     //all these need work...
-
     public void SaveMaze(string filename)
     {
+        if (startTile == null || endTile == null || isGenerating || !GridExists()) return;
 
-        int gridHeight = _grid.GetLength(0);
-        int gridWidth = _grid.GetLength(1);
-
-        string filePath = @"MazeFiles\" + filename + ".txt";
+        string filePath = @"Assets\MazeFiles\" + filename + ".txt";
         StreamWriter mazeFile = new StreamWriter(filePath);
+
+        Debug.Log("Saving file...");
+
+        int gridHeight = Grid.GetLength(0);
+        int gridWidth = Grid.GetLength(1);
+
+        Vector2 startPos = new Vector2(startTile.X, startTile.Y);
+        Vector2 endPos = new Vector2(endTile.X, endTile.Y);
 
         mazeFile.WriteLine(gridHeight);
         mazeFile.WriteLine(gridWidth);
-
-        mazeFile.WriteLine();
 
         for (int i = 0; i < gridHeight; i++)
         {
@@ -448,30 +458,30 @@ public class Maze : MonoBehaviour
             }
         }
 
+        mazeFile.WriteLine(startPos.x);
+        mazeFile.WriteLine(startPos.y);
+        mazeFile.WriteLine(endPos.x);
+        mazeFile.WriteLine(endPos.y);
+
         mazeFile.Close();
 
-        Debug.Log("Saving file...");
+        Debug.Log("File saved");
     }
 
     // ***this should be in the scripts for the file loading screens
-    public string[] GetMazeFiles(bool onlyPlayable)
+    public string[] GetMazeFiles()
     {
-        string[] files = new string[10];
-
-        /*
-        string[] mazeFiles = Directory.GetFiles(@"MazeFiles\", ".txt")
-            .Select(Path.GetFileName)
-            .ToArray();
-        */
-
-        return files;
+        return Directory.GetFiles(@"Assets\MazeFiles\", "*.txt");
     }
 
     // creates a grid from information read from a file
     public void LoadMaze(string fname)
     {
-        string filePath = @"MazeFiles\" + fname + ".txt"; // this will need to be modified
+        if (isGenerating) return;
 
+        Debug.Log("loading file " + fname);
+
+        string filePath = @"Assets\MazeFiles\" + fname; // this will need to be modified
         StreamReader mazeFile;
 
         try
@@ -494,9 +504,24 @@ public class Maze : MonoBehaviour
                         gridCodes[i, j] = mazeFile.ReadLine();
                     }
                 }
+
+                int startX = Int32.Parse(mazeFile.ReadLine());
+                int startY = Int32.Parse(mazeFile.ReadLine());
+                int endX = Int32.Parse(mazeFile.ReadLine());
+                int endY = Int32.Parse(mazeFile.ReadLine());
+
                 this.MakeGridFromCodes(gridCodes);
 
-                // set the start and end tile
+                foreach (TileScript tile in Grid)
+                {
+                    tile.Visit();
+                }
+
+                startTile = Grid[startY, startX];
+                startTile.MakeStartTile();
+
+                endTile = Grid[endY, endX];
+                endTile.MakeEndTile();
             }
         }
         catch (IOException e)

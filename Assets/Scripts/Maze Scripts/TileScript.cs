@@ -63,6 +63,26 @@ public abstract class TileScript : MonoBehaviour {
         return code;
     }
 
+    public int GetNumActiveWalls()
+    {
+        int num = 0;
+
+        for (int i = 0; i < _walls.Length; i++)
+            if (_walls[i].gameObject.activeSelf) num++;
+
+        return num;
+    }
+
+    public int GetNumExistingWalls()
+    {
+        int num = 0;
+
+        for (int i = 0; i < _walls.Length; i++)
+            if (_walls[i].gameObject != null) num++;
+
+        return num;
+    }
+
     public void SetWallsFromCode(string code)
     {
         for (int i = 0; i < _walls.Length; i++)

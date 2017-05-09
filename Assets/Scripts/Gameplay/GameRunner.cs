@@ -39,6 +39,7 @@ public abstract class GameRunner : MonoBehaviour {
         get { return _winText; }
         set
         {
+            if (value == null) return;
             _winText = value;
             _winText.gameObject.SetActive(false);
         }
@@ -89,9 +90,12 @@ public abstract class GameRunner : MonoBehaviour {
 
     protected IEnumerator DisplayWon()
     {
-        WinText.gameObject.SetActive(true);
-        yield return new WaitForSeconds(3);
-        WinText.gameObject.SetActive(false);
+        if (WinText != null)
+        {
+            WinText.gameObject.SetActive(true);
+            yield return new WaitForSeconds(3);
+            WinText.gameObject.SetActive(false);
+        }
         EndGame();
     }
 

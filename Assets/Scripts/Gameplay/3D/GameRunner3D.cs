@@ -13,8 +13,6 @@ public class GameRunner3D : GameRunner {
         Player.GetComponent<Camera>().enabled = true;
     }
 
-    
-
     protected override void PlacePlayer()
     {
         Player.transform.position = Level.startTile.transform.position + new Vector3(0, _actorHeight, 0);
