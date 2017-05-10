@@ -44,6 +44,9 @@ public class Maze : MonoBehaviour
         private set { _grid = value; }
     }
 
+    private HashSet<TileScript> graphNodes = new HashSet<TileScript>(); //tiles representing nodes in a graph
+    private HashSet<TileScript> terminalTiles = new HashSet<TileScript>(); //tiles with exactly 3 walls
+
     [HideInInspector]
     public const int minHeight = 6, minWidth = 6, maxHeight = 32, maxWidth = 32;
 
@@ -270,6 +273,8 @@ public class Maze : MonoBehaviour
         // reset utiity data structures
         tileStack.Clear();
         unvisitedTiles.Clear();
+        graphNodes.Clear();
+        terminalTiles.Clear();
 
         // mark all tiles as unvisited
         MarkAllTilesUnvisited();
@@ -357,6 +362,17 @@ public class Maze : MonoBehaviour
             else if (tileStack.Count > 0)
             {
                 currentTile.Visit();
+
+                if (currentTile.GetNumActiveWalls() == 3)
+                {
+                    terminalTiles.Add(currentTile);
+                    graphNodes.Add(currentTile);
+                }
+
+                string wallCode = currentTile.GetWallCode();
+
+                if (wallCode != "0101" && wallCode != "1010") graphNodes.Add(currentTile);
+
                 currentTile = tileStack.Pop();
                 UpdateStackCount();
             }
@@ -377,6 +393,17 @@ public class Maze : MonoBehaviour
         {
             if (withDelay) yield return new WaitForSeconds(delay);
             currentTile.Visit();
+
+            if (currentTile.GetNumActiveWalls() == 3)
+            {
+                terminalTiles.Add(currentTile);
+                graphNodes.Add(currentTile);
+            }
+
+            string wallCode = currentTile.GetWallCode();
+
+            if (wallCode != "0101" && wallCode != "1010") graphNodes.Add(currentTile);
+
             currentTile = tileStack.Pop();
             UpdateStackCount();
         }

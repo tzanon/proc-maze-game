@@ -145,7 +145,6 @@ public abstract class TileScript : MonoBehaviour {
         SetWallsFromCode("1111");
     }
 
-
     public abstract void Visit();
 
     public abstract void OnStack();
