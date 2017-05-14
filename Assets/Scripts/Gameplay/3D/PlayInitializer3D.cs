@@ -50,16 +50,6 @@ public class PlayInitializer3D : MonoBehaviour
         level.withDelay = true;
 
         /*
-        string[] filenames = level.GetMazeFiles();
-        string filename = filenames[0];
-
-        Button button = Instantiate(FileButton, SelectorContent.transform) as Button;
-        button.onClick.AddListener(LoadFile);
-        Text buttonText = button.GetComponentInChildren<Text>();
-        buttonText.text = filename.Substring(17);
-        */
-
-        /*
         player = Instantiate(PlayerTemplate, new Vector3(-12, 1, 0), Quaternion.identity) as PlayerController3D;
         playerCamera = player.GetComponent<Camera>();
 
@@ -142,12 +132,8 @@ public class PlayInitializer3D : MonoBehaviour
 
     public void DisplayFilenameSelector()
     {
-        //MazeSelector.gameObject.SetActive(true);
         MazeSelector.gameObject.SetActive(true);
         SelectorCloser.gameObject.SetActive(true);
-
-        //GameObject Container = new GameObject("contains buttons");
-        //Container.transform.parent = SelectorContent.transform;
 
         string[] filepaths = level.GetMazeFiles();
 

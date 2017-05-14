@@ -3,6 +3,12 @@ using System.Collections.Generic;
 
 public abstract class TileScript : MonoBehaviour {
 
+    public const string VerticalCorridor = "", HorizontalCorridor = "";
+
+    static string[] _corrCodes = {"1010", "0101"};
+    public static HashSet<string> CorridorCodes = new HashSet<string>(_corrCodes);
+
+
     [HideInInspector]
     public int X, Y;
 

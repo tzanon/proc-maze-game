@@ -44,7 +44,8 @@ public class Maze : MonoBehaviour
         private set { _grid = value; }
     }
 
-    private HashSet<TileScript> graphNodes = new HashSet<TileScript>(); //tiles representing nodes in a graph
+    private Graph graphRepresentation = new Graph();
+    private HashSet<TileScript> graphTiles = new HashSet<TileScript>(); //tiles representing nodes in a graph
     private HashSet<TileScript> terminalTiles = new HashSet<TileScript>(); //tiles with exactly 3 walls
 
     [HideInInspector]
@@ -273,8 +274,9 @@ public class Maze : MonoBehaviour
         // reset utiity data structures
         tileStack.Clear();
         unvisitedTiles.Clear();
-        graphNodes.Clear();
+        graphTiles.Clear();
         terminalTiles.Clear();
+        graphRepresentation.Clear();
 
         // mark all tiles as unvisited
         MarkAllTilesUnvisited();
@@ -366,12 +368,11 @@ public class Maze : MonoBehaviour
                 if (currentTile.GetNumActiveWalls() == 3)
                 {
                     terminalTiles.Add(currentTile);
-                    graphNodes.Add(currentTile);
+                    graphTiles.Add(currentTile);
                 }
 
                 string wallCode = currentTile.GetWallCode();
-
-                if (wallCode != "0101" && wallCode != "1010") graphNodes.Add(currentTile);
+                if (wallCode != "0101" && wallCode != "1010") graphTiles.Add(currentTile);
 
                 currentTile = tileStack.Pop();
                 UpdateStackCount();
@@ -397,12 +398,11 @@ public class Maze : MonoBehaviour
             if (currentTile.GetNumActiveWalls() == 3)
             {
                 terminalTiles.Add(currentTile);
-                graphNodes.Add(currentTile);
+                graphTiles.Add(currentTile);
             }
 
             string wallCode = currentTile.GetWallCode();
-
-            if (wallCode != "0101" && wallCode != "1010") graphNodes.Add(currentTile);
+            if (TileScript.CorridorCodes.Contains(wallCode)) graphTiles.Add(currentTile);
 
             currentTile = tileStack.Pop();
             UpdateStackCount();
@@ -418,7 +418,7 @@ public class Maze : MonoBehaviour
         int endY = Grid.GetLength(0) - 1;
         int endX = UnityEngine.Random.Range(0, Grid.GetLength(1));
 
-        // select a tile in the 1st or 2nd last rows with 3 walls for end tile
+        // preferably, select a tile in the 1st or 2nd last rows with 3 walls for end tile
         for (int i = Grid.GetLength(0) - 2; i < Grid.GetLength(0); i++)
         {
             for (int j = 0; j < Grid.GetLength(1); j++)
@@ -452,6 +452,27 @@ public class Maze : MonoBehaviour
         return unvisitedNeighbours;
     }
 
+    #endregion
+
+    #region graph making methods
+
+    public void FindNodes()
+    {
+
+    }
+
+    public void MakeGraph()
+    {
+        foreach (TileScript tile in graphTiles)
+        {
+            graphRepresentation.AddNode(new Node(tile));
+        }
+    }
+
+    private void FindNeighbours(Node node)
+    {
+
+    }
 
     #endregion
 

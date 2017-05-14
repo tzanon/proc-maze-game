@@ -1,8 +1,8 @@
-﻿
-using UnityEngine;
+﻿using UnityEngine;
 
-public class Edge : MonoBehaviour {
+public class Edge {
 
+    public enum Directions { North, East, South, West, Origin };
     private Node _node1, _node2;
     private int _weight;
 
@@ -31,33 +31,33 @@ public class Edge : MonoBehaviour {
         get { return _weight; }
     }
 
-	void Start () {
-		
-	}
+    public Edge()
+    {
+        _weight = int.MaxValue;
+    }
 	
     private void CalculateWeight()
     {
         if (Node1 == null || Node2 == null ||
             (Node1.X != Node2.X && Node1.Y != Node2.Y))
-        _weight = -1;
-        if (Node1.X == Node2.X)
-        {
-            _weight = Mathf.Abs(Node1.Y - Node2.Y);
-        }
+            _weight = int.MaxValue;
         else
         {
-            _weight = Mathf.Abs(Node1.X - Node2.X);
+            if (Node1.X == Node2.X)
+            {
+                _weight = Mathf.Abs(Node1.Y - Node2.Y);
+            }
+            else
+            {
+                _weight = Mathf.Abs(Node1.X - Node2.X);
+            }
         }
     }
-
+    
     public bool EquivalentTo(Edge other)
     {
-        if ((this.Node1 == other.Node1 && this.Node2 == other.Node2) ||
-            (this.Node1 == other.Node2 && this.Node2 == other.Node1))
-        {
-            return true;
-        }
-        return false;
+        return ((this.Node1 == other.Node1 && this.Node2 == other.Node2) ||
+            (this.Node1 == other.Node2 && this.Node2 == other.Node1));
     }
 
 }
