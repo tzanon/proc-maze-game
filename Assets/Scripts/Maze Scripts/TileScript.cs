@@ -8,18 +8,22 @@ public abstract class TileScript : MonoBehaviour {
     static string[] _corrCodes = {"1010", "0101"};
     public static HashSet<string> CorridorCodes = new HashSet<string>(_corrCodes);
 
-
     [HideInInspector]
     public int X, Y;
-
-    public enum Directions { Up, Right, Down, Left, Centre };
 
     public WallScript WallTemplate;
 
     protected WallScript[] _walls = new WallScript[4];
     protected Dictionary<Directions, WallScript> _wallDirs = new Dictionary<Directions, WallScript>();
     protected Dictionary<Directions, WallScript> _correspondingWallDirs = new Dictionary<Directions, WallScript>();
-    protected Dictionary<Directions, Directions> _correspondingDirs = new Dictionary<Directions, Directions>();
+    
+    public static Dictionary<Directions, Directions> CorrespondingDirs = new Dictionary<Directions, Directions>
+    {
+        { Directions.North, Directions.South },
+        { Directions.East, Directions.West },
+        { Directions.South, Directions.North },
+        { Directions.West, Directions.East }
+    };
 
     public abstract Vector3 StartingPosition
     {
@@ -36,10 +40,12 @@ public abstract class TileScript : MonoBehaviour {
 
     protected virtual void Awake()
     {
-        _correspondingDirs.Add(Directions.Up, Directions.Down);
-        _correspondingDirs.Add(Directions.Right, Directions.Left);
-        _correspondingDirs.Add(Directions.Down, Directions.Up);
-        _correspondingDirs.Add(Directions.Left, Directions.Right);
+        /*
+        _correspondingDirs.Add(Directions.North, Directions.South);
+        _correspondingDirs.Add(Directions.East, Directions.West);
+        _correspondingDirs.Add(Directions.South, Directions.North);
+        _correspondingDirs.Add(Directions.West, Directions.East);
+        */
     }
 
     protected virtual void InitWall(Directions dir, Vector3 offset, Vector3 rotation)
@@ -51,10 +57,15 @@ public abstract class TileScript : MonoBehaviour {
         _walls[d].transform.localRotation = Quaternion.Euler(rotation);
 
         _wallDirs.Add(dir, _walls[d]);
-        _correspondingWallDirs.Add(_correspondingDirs[dir], _walls[d]);
+        _correspondingWallDirs.Add(CorrespondingDirs[dir], _walls[d]);
     }
 
     protected abstract void CreateWalls();
+
+    public bool WallActive(Directions d)
+    {
+        return _walls[(int)d].gameObject.activeSelf;
+    }
 
     public string GetWallCode()
     {
@@ -105,10 +116,10 @@ public abstract class TileScript : MonoBehaviour {
         Vector3 thisPos = this.transform.position;
         Vector3 otherPos = otherTile.transform.position;
 
-        if      (otherTile.X - this.X > 0) direction = Directions.Right;
-        else if (otherTile.X - this.X < 0) direction = Directions.Left;
-        else if (otherTile.Y - this.Y > 0) direction = Directions.Up;
-        else if (otherTile.Y - this.Y < 0) direction = Directions.Down;
+        if      (otherTile.X - this.X > 0) direction = Directions.East;
+        else if (otherTile.X - this.X < 0) direction = Directions.West;
+        else if (otherTile.Y - this.Y > 0) direction = Directions.North;
+        else if (otherTile.Y - this.Y < 0) direction = Directions.South;
         else return; // the two tiles must be the same
 
         this.RemoveWall(direction);
@@ -133,10 +144,10 @@ public abstract class TileScript : MonoBehaviour {
         Vector3 thisPos = this.transform.position;
         Vector3 otherPos = otherTile.transform.position;
 
-        if      (otherTile.X - this.X > 0) direction = Directions.Right;
-        else if (otherTile.X - this.X < 0) direction = Directions.Left;
-        else if (otherTile.Y - this.Y > 0) direction = Directions.Up;
-        else if (otherTile.Y - this.Y < 0) direction = Directions.Down;
+        if      (otherTile.X - this.X > 0) direction = Directions.East;
+        else if (otherTile.X - this.X < 0) direction = Directions.West;
+        else if (otherTile.Y - this.Y > 0) direction = Directions.North;
+        else if (otherTile.Y - this.Y < 0) direction = Directions.South;
         else return true; // the two tiles must be the same
 
         if (this._wallDirs[direction].gameObject.activeSelf

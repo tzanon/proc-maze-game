@@ -35,12 +35,20 @@ public class Edge {
     {
         _weight = int.MaxValue;
     }
+
+    public Edge(Node n1, Node n2)
+    {
+        _node1 = n1;
+        _node2 = n2;
+        CalculateWeight();
+    }
 	
     private void CalculateWeight()
     {
         if (Node1 == null || Node2 == null ||
             (Node1.X != Node2.X && Node1.Y != Node2.Y))
             _weight = int.MaxValue;
+        
         else
         {
             if (Node1.X == Node2.X)

@@ -70,20 +70,6 @@ public class PlayInitializer3D : MonoBehaviour
         PlayDisplay.SetActive(false);
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            //CycleCameras();
-        }
-    }
-
-    private void CycleCameras()
-    {
-        TopViewCam.enabled = !TopViewCam.enabled;
-        playerCamera.enabled = !playerCamera.enabled;
-    }
-
     private void RepositionTopViewCam()
     {
         TileScript[,] grid = level.Grid;
@@ -193,6 +179,7 @@ public class PlayInitializer3D : MonoBehaviour
         if (fname == "") return;
         level.LoadMaze(fname);
         CloseFilenameSelector();
+        RepositionTopViewCam();
     }
 
     public void Generate()
@@ -242,9 +229,20 @@ public class PlayInitializer3D : MonoBehaviour
         RepositionTopViewCam();
     }
     
+    public void ShowGraphRep()
+    {
+        level.ShowGraph();
+    }
+
+    public void ShowMazeRep()
+    {
+        level.ShowMaze();
+    }
+
     public void PlayLevel()
     {
         if (!level.Playable()) return;
+        level.HideGraph();
         MazeDisplay.gameObject.SetActive(false);
         PlayDisplay.SetActive(true);
         TopViewCam.enabled = false;

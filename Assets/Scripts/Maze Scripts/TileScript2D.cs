@@ -51,15 +51,15 @@ public class TileScript2D : TileScript
         _wallDirs.Clear();
         _correspondingWallDirs.Clear();
 
-        WallScript upWall = _walls[(int)Directions.Up];
-        WallScript rightWall = _walls[(int)Directions.Right];
-        WallScript downWall = _walls[(int)Directions.Down];
-        WallScript leftWall = _walls[(int)Directions.Left];
+        WallScript upWall = _walls[(int)Directions.North];
+        WallScript rightWall = _walls[(int)Directions.East];
+        WallScript downWall = _walls[(int)Directions.South];
+        WallScript leftWall = _walls[(int)Directions.West];
 
-        InitWall(Directions.Up,    new Vector3(        0,  _wallPos,    0),           Vector3.zero);
-        InitWall(Directions.Right, new Vector3( _wallPos,         0,    0),  new Vector3(0, 0, 90));
-        InitWall(Directions.Down,  new Vector3(        0, -_wallPos,    0),           Vector3.zero);
-        InitWall(Directions.Left,  new Vector3(-_wallPos,         0,    0),  new Vector3(0, 0, 90));
+        InitWall(Directions.North,    new Vector3(        0,  _wallPos,    0),           Vector3.zero);
+        InitWall(Directions.East, new Vector3( _wallPos,         0,    0),  new Vector3(0, 0, 90));
+        InitWall(Directions.South,  new Vector3(        0, -_wallPos,    0),           Vector3.zero);
+        InitWall(Directions.West,  new Vector3(-_wallPos,         0,    0),  new Vector3(0, 0, 90));
 
     }
 

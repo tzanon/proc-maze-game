@@ -3,10 +3,18 @@ using UnityEngine;
 
 public class Graph {
 
-    public enum Directions { North, East, South, West, Origin };
-
     private Dictionary<Vector2, Node> _nodes;
     private HashSet<Edge> _edges;
+
+    public HashSet<Node> Nodes
+    {
+        get { return new HashSet<Node>(_nodes.Values); }
+    }
+
+    public HashSet<Edge> Edges
+    {
+        get { return _edges; }
+    }
 
     public Graph()
     {
@@ -24,6 +32,15 @@ public class Graph {
 	public void AddNode(Node node)
     {
         _nodes.Add(new Vector2(node.X, node.Y), node);
+    }
+
+    public void AddEdge(Edge edge)
+    {
+        foreach (Edge e in Edges)
+        {
+            if (edge.EquivalentTo(e)) return;
+        }
+        _edges.Add(edge);
     }
 
     public Node GetNodeAtPoint(int x, int y)

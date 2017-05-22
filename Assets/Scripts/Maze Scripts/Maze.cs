@@ -44,20 +44,22 @@ public class Maze : MonoBehaviour
         private set { _grid = value; }
     }
 
-    private Graph graphRepresentation = new Graph();
-    private HashSet<TileScript> graphTiles = new HashSet<TileScript>(); //tiles representing nodes in a graph
-    private HashSet<TileScript> terminalTiles = new HashSet<TileScript>(); //tiles with exactly 3 walls
-
     [HideInInspector]
     public const int minHeight = 6, minWidth = 6, maxHeight = 32, maxWidth = 32;
 
     public bool withDelay;
 
-    // for constructing the grid in the scene
-    //private const float _startX = -8.25f;
-    //private const float _startY = -4f;
-    //private Vector3 incr;
-    //private Vector2 position;
+    #region graph variables
+
+    public GameObject NodeMarker, EdgeMarker;
+    private GameObject[] nodeMarkers, edgeMarkers;
+
+    private Graph graphRepresentation = new Graph();
+    private HashSet<TileScript> graphTiles = new HashSet<TileScript>(); //tiles representing nodes in a graph
+    private HashSet<TileScript> terminalTiles = new HashSet<TileScript>(); //tiles with exactly 3 walls
+    private Dictionary<Directions, Vector2> directionVectors = new Dictionary<Directions, Vector2>();
+
+    #endregion
 
     #region generation variables
 
@@ -78,6 +80,11 @@ public class Maze : MonoBehaviour
         UpdateUnvisitedTiles();
         isGenerating = false;
         withDelay = true;
+
+        directionVectors.Add(Directions.North, new Vector2(0, 1));
+        directionVectors.Add(Directions.East, new Vector2(1, 0));
+        directionVectors.Add(Directions.South, new Vector2(0, -1));
+        directionVectors.Add(Directions.West, new Vector2(-1, 0));
     }
 
     #region general utility methods
@@ -86,7 +93,7 @@ public class Maze : MonoBehaviour
     {
         MakeBlankGrid(minHeight, minWidth);
 
-        //StartGeneration();
+        StartGeneration();
     }
 
     public void MakeMedMaze()
@@ -269,7 +276,8 @@ public class Maze : MonoBehaviour
     // sets the data structures used in the generation process
     public void PrepareForGeneration()
     {
-        // make maze blank
+        HideGraph();
+        ShowMaze();
 
         // reset utiity data structures
         tileStack.Clear();
@@ -284,7 +292,6 @@ public class Maze : MonoBehaviour
         // update GUI display
         UpdateStackCount();
         UpdateUnvisitedTiles();
-
     }
 
     // marks all tiles in the grid as unvisited
@@ -308,7 +315,7 @@ public class Maze : MonoBehaviour
     }
 
     // generates a maze using randomized depth-first search with backtracking
-    // ***DO NOT MODIFY THIS METHOD***
+    // ***DO NOT MODIFY THE DFS***
     private IEnumerator GenerateMaze()
     {
         /*
@@ -365,15 +372,6 @@ public class Maze : MonoBehaviour
             {
                 currentTile.Visit();
 
-                if (currentTile.GetNumActiveWalls() == 3)
-                {
-                    terminalTiles.Add(currentTile);
-                    graphTiles.Add(currentTile);
-                }
-
-                string wallCode = currentTile.GetWallCode();
-                if (wallCode != "0101" && wallCode != "1010") graphTiles.Add(currentTile);
-
                 currentTile = tileStack.Pop();
                 UpdateStackCount();
             }
@@ -394,15 +392,6 @@ public class Maze : MonoBehaviour
         {
             if (withDelay) yield return new WaitForSeconds(delay);
             currentTile.Visit();
-
-            if (currentTile.GetNumActiveWalls() == 3)
-            {
-                terminalTiles.Add(currentTile);
-                graphTiles.Add(currentTile);
-            }
-
-            string wallCode = currentTile.GetWallCode();
-            if (TileScript.CorridorCodes.Contains(wallCode)) graphTiles.Add(currentTile);
 
             currentTile = tileStack.Pop();
             UpdateStackCount();
@@ -433,6 +422,9 @@ public class Maze : MonoBehaviour
         
         endTile = Grid[endY, endX];
         endTile.MakeEndTile();
+
+        FindNodes();
+        MakeGraph();
         
         isGenerating = false;
     }
@@ -456,22 +448,101 @@ public class Maze : MonoBehaviour
 
     #region graph making methods
 
+    public void ShowMaze()
+    {
+        HideGraph();
+
+        foreach (TileScript tile in Grid)
+        {
+            tile.gameObject.SetActive(true);
+        }
+    }
+    
+    public void HideGraph()
+    {
+        if (nodeMarkers == null) return;
+        //Debug.Log("hiding graph");
+
+        foreach (GameObject marker in nodeMarkers)
+        {
+            Destroy(marker);
+        }
+    }
+
+    public void ShowGraph()
+    {
+        /*
+        foreach (TileScript tile in Grid)
+        {
+            //if (!graphTiles.Contains(tile)) tile.gameObject.SetActive(!tile.gameObject.activeSelf);
+            tile.gameObject.SetActive(false);
+        }
+        */
+
+        HideGraph();
+
+        nodeMarkers = new GameObject[graphRepresentation.Nodes.Count];
+        Node[] graphNodes = new Node[graphRepresentation.Nodes.Count];
+        graphRepresentation.Nodes.CopyTo(graphNodes);
+
+        for (int i = 0; i < graphNodes.Length; i++)
+        {
+            nodeMarkers[i] = Instantiate(NodeMarker, graphNodes[i].WorldLocation, Quaternion.identity);
+        }
+
+    }
+
     public void FindNodes()
     {
-
+        graphTiles.Clear();
+        terminalTiles.Clear();
+        graphRepresentation.Clear();
+        foreach (TileScript tile in Grid)
+        {
+            if (!TileScript.CorridorCodes.Contains(tile.GetWallCode()))
+            {
+                graphTiles.Add(tile);
+                graphRepresentation.AddNode(new Node(tile));
+                if (tile.GetNumActiveWalls() == 3) terminalTiles.Add(tile);
+            }
+        }
     }
 
     public void MakeGraph()
     {
-        foreach (TileScript tile in graphTiles)
+        foreach (Node node in graphRepresentation.Nodes)
         {
-            graphRepresentation.AddNode(new Node(tile));
+            FindNodeNeighbours(node);
         }
     }
 
-    private void FindNeighbours(Node node)
+    private void FindNodeNeighbours(Node node)
     {
+        foreach (Directions dir in Enum.GetValues(typeof(Directions)))
+        {
+            if (!node.CorrespondingTile.WallActive(dir) && !node.HasNeighbour(dir))
+            {
+                Vector2 incrVector = directionVectors[dir];
 
+                Vector2 currentVector = new Vector2(node.X, node.Y);
+                TileScript currentTile;
+                int distance = 0;
+
+                do
+                {
+                    currentVector += incrVector;
+                    currentTile = Grid[(int)currentVector.y, (int)currentVector.x];
+                    distance++;
+                } while (!graphTiles.Contains(currentTile));
+
+                Node neighbour = new Node(currentTile);
+                node.AddNeighbour(neighbour, dir, distance);
+                neighbour.AddNeighbour(node, TileScript.CorrespondingDirs[dir], distance);
+
+                Edge edge = new Edge(node, neighbour);
+                graphRepresentation.AddEdge(edge);
+            }
+        }
     }
 
     #endregion
@@ -529,13 +600,15 @@ public class Maze : MonoBehaviour
 
         Debug.Log("loading file " + fname);
 
-        string filePath = @"Assets\MazeFiles\" + fname; // this will need to be modified
+        string filePath = @"Assets\MazeFiles\" + fname;
         StreamReader mazeFile;
 
         try
         {
             using (StreamReader mazeFileReader = new StreamReader(filePath))
             {
+                HideGraph();
+
                 Debug.Log("Loading file...");
                 mazeFile = new StreamReader(filePath);
 
@@ -570,6 +643,8 @@ public class Maze : MonoBehaviour
 
                 endTile = Grid[endY, endX];
                 endTile.MakeEndTile();
+
+                FindNodes();
             }
         }
         catch (IOException e)

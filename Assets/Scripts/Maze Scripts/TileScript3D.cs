@@ -49,15 +49,15 @@ public class TileScript3D : TileScript {
         _wallDirs.Clear();
         _correspondingWallDirs.Clear();
 
-        WallScript upWall = _walls[(int)Directions.Up];
-        WallScript rightWall = _walls[(int)Directions.Right];
-        WallScript downWall = _walls[(int)Directions.Down];
-        WallScript leftWall = _walls[(int)Directions.Left];
+        WallScript upWall = _walls[(int)Directions.North];
+        WallScript rightWall = _walls[(int)Directions.East];
+        WallScript downWall = _walls[(int)Directions.South];
+        WallScript leftWall = _walls[(int)Directions.West];
 
-        InitWall(Directions.Up,    new Vector3(         0,  _yWallPos,  _xWallPos), new Vector3(90, 0, 0));
-        InitWall(Directions.Right, new Vector3( _xWallPos,  _yWallPos,          0), new Vector3(90, 90, 0));
-        InitWall(Directions.Down,  new Vector3(         0,  _yWallPos, -_xWallPos), new Vector3(90, 0, 0));
-        InitWall(Directions.Left,  new Vector3(-_xWallPos,  _yWallPos,          0), new Vector3(90, 90, 0));
+        InitWall(Directions.North,    new Vector3(         0,  _yWallPos,  _xWallPos), new Vector3(90, 0, 0));
+        InitWall(Directions.East, new Vector3( _xWallPos,  _yWallPos,          0), new Vector3(90, 90, 0));
+        InitWall(Directions.South,  new Vector3(         0,  _yWallPos, -_xWallPos), new Vector3(90, 0, 0));
+        InitWall(Directions.West,  new Vector3(-_xWallPos,  _yWallPos,          0), new Vector3(90, 90, 0));
 
     }
 
