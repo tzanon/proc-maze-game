@@ -4,21 +4,20 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 /**
- * GENERAL C# "CONVENTIONS:"
- * PascalCase for public member variables (string MyName = "James")
- * camelCase for local variables (string myName = "James")
- * _leadingUnderscore for private member variables (string _myName = "James")
- * 
+ * C# naming conventions
+ * camelCase for member vars, parameters, local vars
+ * PascalCase for function, property, event, class names
+ * prefix interface names with I
+ * don't prefix enums, classes, delegates with letters
  */
 
 // a class to store information about a maze object
 public class Maze : MonoBehaviour
 {
-    public TileScript TileTemplate;
-    private TileScript[,] _grid;
+    public TileScript tileTemplate;
+    private TileScript[,] grid;
     [HideInInspector]
     public TileScript startTile, endTile;
 
@@ -26,7 +25,7 @@ public class Maze : MonoBehaviour
     {
         get
         {
-            if (_grid != null) return _grid.GetLength(0);
+            if (grid != null) return grid.GetLength(0);
             else return -1;
         }
     }
@@ -34,14 +33,14 @@ public class Maze : MonoBehaviour
     {
         get
         {
-            if (_grid != null) return _grid.GetLength(1);
+            if (grid != null) return grid.GetLength(1);
             else return -1;
         }
     }
     public TileScript[,] Grid
     {
-        get { return _grid; }
-        private set { _grid = value; }
+        get { return grid; }
+        private set { grid = value; }
     }
 
     [HideInInspector]
@@ -51,8 +50,13 @@ public class Maze : MonoBehaviour
 
     #region graph variables
 
-    public GameObject NodeMarker, EdgeMarker;
-    private GameObject[] nodeMarkers, edgeMarkers;
+    // temp
+    int createdEdges = 0;
+    int addedEdges = 0;
+
+    public GameObject nodeMarker, edgeMarker;
+    private GameObject[] nodeMarkers; // edgeMarkers;
+    private HashSet<GameObject> edgeMarkers = new HashSet<GameObject>();
 
     private Graph graphRepresentation = new Graph();
     private HashSet<TileScript> graphTiles = new HashSet<TileScript>(); //tiles representing nodes in a graph
@@ -148,22 +152,22 @@ public class Maze : MonoBehaviour
         Debug.Log("new height is " + Height);
         Debug.Log("new width is " + Width);
 
-        Vector3 position = TileTemplate.StartingPosition;
-        Vector3 xIncr = TileTemplate.HorizontalSpawnIncrement;
-        Vector3 yIncr = TileTemplate.VerticalSpawnIncrement;
+        Vector3 position = tileTemplate.StartingPosition;
+        Vector3 xIncr = tileTemplate.HorizontalSpawnIncrement;
+        Vector3 yIncr = tileTemplate.VerticalSpawnIncrement;
 
         for (int i = 0; i < Height; i++)
         {
             for (int j = 0; j < Width; j++)
             {
-                TileScript newTile = Grid[i, j] = Instantiate(TileTemplate, position, Quaternion.identity) as TileScript;
+                TileScript newTile = Grid[i, j] = Instantiate(tileTemplate, position, Quaternion.identity) as TileScript;
                 newTile.X = j;
                 newTile.Y = i;
                 newTile.SetWallsFromCode(gridCodes[i, j]);
 
                 position += xIncr;
             }
-            position.x = TileTemplate.StartingPosition.x;
+            position.x = tileTemplate.StartingPosition.x;
             position += yIncr;
         }
         // set start and end tile now
@@ -467,6 +471,15 @@ public class Maze : MonoBehaviour
         {
             Destroy(marker);
         }
+
+        if (edgeMarkers == null) return;
+
+        foreach (GameObject marker in edgeMarkers)
+        {
+            Destroy(marker);
+        }
+
+        edgeMarkers.Clear();
     }
 
     public void ShowGraph()
@@ -487,9 +500,60 @@ public class Maze : MonoBehaviour
 
         for (int i = 0; i < graphNodes.Length; i++)
         {
-            nodeMarkers[i] = Instantiate(NodeMarker, graphNodes[i].WorldLocation, Quaternion.identity);
+            nodeMarkers[i] = Instantiate(nodeMarker, graphNodes[i].WorldLocation, Quaternion.identity);
         }
 
+        //edgeMarkers = new GameObject[graphRepresentation.Edges.Count];
+        
+        Edge[] graphEdges = new Edge[graphRepresentation.Edges.Count];
+        graphRepresentation.Edges.CopyTo(graphEdges);
+
+        for (int i = 0; i < graphEdges.Length; i++)
+        {
+            int edgeLength = graphEdges[i].Weight - 1;
+            // try with line renderers
+
+            if (graphEdges[i].GetDirection() == Directions.North)
+            {
+                //edgeMarkers[i] = Instantiate(edgeMarker, graphEdges[i].Node1.WorldLocation + Vector3.forward, Quaternion.identity);
+                Vector3 spawnLocation = graphEdges[i].Node1.WorldLocation + Vector3.forward;
+                for (int j = 0; j < graphEdges[i].Weight; j++)
+                {
+                    edgeMarkers.Add(Instantiate(edgeMarker, spawnLocation, Quaternion.identity));
+                    spawnLocation.z += 2f;
+                }
+            }
+            else if (graphEdges[i].GetDirection() == Directions.South)
+            {
+                //edgeMarkers[i] = Instantiate(edgeMarker, graphEdges[i].Node1.WorldLocation - Vector3.forward, Quaternion.identity);
+                Vector3 spawnLocation = graphEdges[i].Node1.WorldLocation - Vector3.forward;
+                for (int j = 0; j < graphEdges[i].Weight; j++)
+                {
+                    edgeMarkers.Add(Instantiate(edgeMarker, spawnLocation, Quaternion.identity));
+                    spawnLocation.z -= 2f;
+                }
+            }
+            else if (graphEdges[i].GetDirection() == Directions.East)
+            {
+                //edgeMarkers[i] = Instantiate(edgeMarker, graphEdges[i].Node1.WorldLocation + Vector3.right, Quaternion.Euler(0, 90, 0));
+                Vector3 spawnLocation = graphEdges[i].Node1.WorldLocation + Vector3.right;
+                for (int j = 0; j < graphEdges[i].Weight; j++)
+                {
+                    edgeMarkers.Add(Instantiate(edgeMarker, spawnLocation, Quaternion.Euler(0, 90, 0)));
+                    spawnLocation.x += 2f;
+                }
+            }
+            else
+            {
+                //edgeMarkers[i] = Instantiate(edgeMarker, graphEdges[i].Node1.WorldLocation - Vector3.right, Quaternion.Euler(0, 90, 0));
+                Vector3 spawnLocation = graphEdges[i].Node1.WorldLocation - Vector3.right;
+                for (int j = 0; j < graphEdges[i].Weight; j++)
+                {
+                    edgeMarkers.Add(Instantiate(edgeMarker, spawnLocation, Quaternion.Euler(0, 90, 0)));
+                    spawnLocation.x -= 2f;
+                }
+            }
+        }
     }
 
     public void FindNodes()
@@ -514,10 +578,12 @@ public class Maze : MonoBehaviour
         {
             FindNodeNeighbours(node);
         }
+        Debug.Log("edges made: " + createdEdges + ", added: " + addedEdges);
     }
 
     private void FindNodeNeighbours(Node node)
     {
+
         foreach (Directions dir in Enum.GetValues(typeof(Directions)))
         {
             if (!node.CorrespondingTile.WallActive(dir) && !node.HasNeighbour(dir))
@@ -540,7 +606,8 @@ public class Maze : MonoBehaviour
                 neighbour.AddNeighbour(node, TileScript.CorrespondingDirs[dir], distance);
 
                 Edge edge = new Edge(node, neighbour);
-                graphRepresentation.AddEdge(edge);
+                createdEdges++;
+                if (graphRepresentation.AddEdge(edge)) addedEdges++;
             }
         }
     }
@@ -572,7 +639,7 @@ public class Maze : MonoBehaviour
         {
             for (int j = 0; j < gridWidth; j++)
             {
-                string wallCode = _grid[i, j].GetWallCode();
+                string wallCode = grid[i, j].GetWallCode();
                 mazeFile.WriteLine(wallCode);
             }
         }

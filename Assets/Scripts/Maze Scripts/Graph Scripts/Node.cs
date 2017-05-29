@@ -6,7 +6,7 @@ public class Node
 
     private class NeighbourInfo
     {
-        public Node _neighbour;
+        private Node _neighbour;
         private int _distance;
 
         public Node Neighbour
@@ -34,8 +34,6 @@ public class Node
 
     private TileScript _correspondingTile;
     private Dictionary<Directions, NeighbourInfo> NeighbourInfos = new Dictionary<Directions, NeighbourInfo>();
-
-    private Vector3 _worldLocation;
 
     public int X
     {
@@ -71,7 +69,7 @@ public class Node
 
     public bool HasNeighbour(Directions direction)
     {
-        return NeighbourInfos[direction]._neighbour != null;
+        return NeighbourInfos[direction].Neighbour != null;
     }
 
     public Node GetNeighbour(Directions direction)
@@ -79,9 +77,14 @@ public class Node
         return NeighbourInfos[direction].Neighbour;
     }
 
+    public bool EquivalentTo(Node other)
+    {
+        return (this.X == other.X && this.Y == other.Y);
+    }
+
     public override string ToString()
     {
-        return "";
+        return "(" + X + ", " + Y + ") at " + WorldLocation;
     }
 
 }

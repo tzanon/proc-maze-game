@@ -34,13 +34,14 @@ public class Graph {
         _nodes.Add(new Vector2(node.X, node.Y), node);
     }
 
-    public void AddEdge(Edge edge)
+    public bool AddEdge(Edge edge)
     {
         foreach (Edge e in Edges)
         {
-            if (edge.EquivalentTo(e)) return;
+            if (edge.EquivalentTo(e)) return false;
         }
         _edges.Add(edge);
+        return true;
     }
 
     public Node GetNodeAtPoint(int x, int y)

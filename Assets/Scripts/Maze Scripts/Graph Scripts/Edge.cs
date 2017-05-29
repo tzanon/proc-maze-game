@@ -2,9 +2,9 @@
 
 public class Edge {
 
-    public enum Directions { North, East, South, West, Origin };
     private Node _node1, _node2;
     private int _weight;
+    
 
     public Node Node1
     {
@@ -15,7 +15,6 @@ public class Edge {
             CalculateWeight();
         }
     }
-
     public Node Node2
     {
         get { return _node2; }
@@ -25,7 +24,6 @@ public class Edge {
             CalculateWeight();
         }
     }
-
     public int Weight
     {
         get { return _weight; }
@@ -48,7 +46,7 @@ public class Edge {
         if (Node1 == null || Node2 == null ||
             (Node1.X != Node2.X && Node1.Y != Node2.Y))
             _weight = int.MaxValue;
-        
+
         else
         {
             if (Node1.X == Node2.X)
@@ -61,11 +59,30 @@ public class Edge {
             }
         }
     }
+
+    public Directions GetDirection()
+    {
+        if (Node1.X == Node2.X)
+        {
+            if (Node1.Y < Node2.Y) return Directions.North;
+            else return Directions.South;
+        }
+        else
+        {
+            if (Node1.X < Node2.X) return Directions.East;
+            else return Directions.West;
+        }
+    }
     
     public bool EquivalentTo(Edge other)
     {
-        return ((this.Node1 == other.Node1 && this.Node2 == other.Node2) ||
-            (this.Node1 == other.Node2 && this.Node2 == other.Node1));
+        return (this.Node1.EquivalentTo(other.Node2) && this.Node2.EquivalentTo(other.Node1) ||
+            this.Node1.EquivalentTo(other.Node1) && this.Node2.EquivalentTo(other.Node2));
+    }
+
+    public override string ToString()
+    {
+        return "Node1: " + Node1.ToString() + ", Node2: " + Node2.ToString() + ", Weight: " + Weight;
     }
 
 }

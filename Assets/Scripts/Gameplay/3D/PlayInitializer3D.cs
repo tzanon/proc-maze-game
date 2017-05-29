@@ -4,30 +4,29 @@ using UnityEngine.UI;
 
 public class PlayInitializer3D : MonoBehaviour
 {
-    public Maze MazeTemplate;
-    public GameRunner3D RunnerTemplate;
-    public TileScript3D TileTemplate;
-    public PlayerController3D PlayerTemplate;
+    public Maze mazeTemplate;
+    public GameRunner3D runnerTemplate;
+    public TileScript3D tileTemplate;
+    public PlayerController3D playerTemplate;
 
-    public Canvas UICanvas;
-    public CanvasRenderer MazeDisplay;
-    public GameObject PlayDisplay;
-    public InputField HeightSetter;
-    public InputField WidthSetter;
-    public Text StackSizeText;
-    public Text UnvisitedTilesText;
+    public Canvas userInterfaceCanvas;
+    public CanvasRenderer mazeDisplay;
+    public GameObject playDisplay;
+    public InputField heightSetter;
+    public InputField widthSetter;
+    public Text stackSizeText;
+    public Text unvisitedTilesText;
 
-    public InputField SaveFilenameSetter;
-    public InputField LoadFilenameSetter;
+    public InputField saveFilenameSetter;
+    public InputField loadFilenameSetter;
 
-    public ScrollRect MazeSelector;
-    private VerticalLayoutGroup SelectorContent;
-    public GameObject ButtonContainer;
-    public CanvasRenderer SelectorCloser;
-    public Button FileButton;
+    public ScrollRect mazeSelector;
+    private VerticalLayoutGroup selectorContent;
+    public CanvasRenderer selectorCloser;
+    public Button fileButton;
 
     [SerializeField]
-    private Camera TopViewCam;
+    private Camera topViewCam;
     private Camera playerCamera;
     private PlayerController3D player;
     private PlayLevelManager manager;
@@ -40,13 +39,13 @@ public class PlayInitializer3D : MonoBehaviour
 
     private void Start()
     {
-        SelectorContent = MazeSelector.GetComponentInChildren<VerticalLayoutGroup>();
-        SaveFilenameSetter.transform.parent.gameObject.SetActive(false);
-        LoadFilenameSetter.transform.parent.gameObject.SetActive(false);
-        MazeSelector.gameObject.SetActive(false);
-        SelectorCloser.gameObject.SetActive(false);
+        selectorContent = mazeSelector.GetComponentInChildren<VerticalLayoutGroup>();
+        saveFilenameSetter.transform.parent.gameObject.SetActive(false);
+        loadFilenameSetter.transform.parent.gameObject.SetActive(false);
+        mazeSelector.gameObject.SetActive(false);
+        selectorCloser.gameObject.SetActive(false);
 
-        level = Instantiate(MazeTemplate) as Maze;
+        level = Instantiate(mazeTemplate) as Maze;
         level.withDelay = true;
 
         /*
@@ -59,15 +58,15 @@ public class PlayInitializer3D : MonoBehaviour
 
         level.MakeBlankGrid(15, 15);
 
-        level.stackCount = StackSizeText;
-        level.setCount = UnvisitedTilesText;
+        level.stackCount = stackSizeText;
+        level.setCount = unvisitedTilesText;
         
-        RepositionTopViewCam();
+        this.RepositionTopViewCam();
 
         level.PrepareForGeneration();
 
-        MazeDisplay.gameObject.SetActive(true);
-        PlayDisplay.SetActive(false);
+        mazeDisplay.gameObject.SetActive(true);
+        playDisplay.SetActive(false);
     }
 
     private void RepositionTopViewCam()
@@ -82,23 +81,23 @@ public class PlayInitializer3D : MonoBehaviour
 
         float gridSize = Mathf.Max(grid.GetLength(0), grid.GetLength(1));
 
-        TopViewCam.transform.position = new Vector3(camX, 3 * gridSize, camZ);
-        TopViewCam.transform.rotation = Quaternion.Euler(90, 0, 0);
-        TopViewCam.orthographicSize = gridSize;
+        topViewCam.transform.position = new Vector3(camX, 3 * gridSize, camZ);
+        topViewCam.transform.rotation = Quaternion.Euler(90, 0, 0);
+        topViewCam.orthographicSize = gridSize;
     }
 
     private void TestTiles()
     {
-        TileScript3D downTile = Instantiate(TileTemplate, Vector3.zero, Quaternion.identity) as TileScript3D;
+        TileScript3D downTile = Instantiate(tileTemplate, Vector3.zero, Quaternion.identity) as TileScript3D;
         downTile.X = 0; downTile.Y = 0;
 
-        TileScript3D upTile = Instantiate(TileTemplate, new Vector3(0, 0, 3), Quaternion.identity) as TileScript3D;
+        TileScript3D upTile = Instantiate(tileTemplate, new Vector3(0, 0, 3), Quaternion.identity) as TileScript3D;
         upTile.X = 0; upTile.Y = 1;
 
-        TileScript3D rightTile = Instantiate(TileTemplate, new Vector3(3, 0, 0), Quaternion.identity) as TileScript3D;
+        TileScript3D rightTile = Instantiate(tileTemplate, new Vector3(3, 0, 0), Quaternion.identity) as TileScript3D;
         rightTile.X = 1; rightTile.Y = 0;
 
-        TileScript3D leftTile = Instantiate(TileTemplate, new Vector3(-3, 0, 0), Quaternion.identity) as TileScript3D;
+        TileScript3D leftTile = Instantiate(tileTemplate, new Vector3(-3, 0, 0), Quaternion.identity) as TileScript3D;
         leftTile.X = -1; leftTile.Y = 0;
 
         upTile.RemoveWallsBetweenTiles(downTile);
@@ -108,25 +107,25 @@ public class PlayInitializer3D : MonoBehaviour
 
     public void DisplaySaveFilenameInput()
     {
-        SaveFilenameSetter.transform.parent.gameObject.SetActive(true);
+        saveFilenameSetter.transform.parent.gameObject.SetActive(true);
     }
 
     public void CloseSaveInput()
     {
-        SaveFilenameSetter.transform.parent.gameObject.SetActive(false);
+        saveFilenameSetter.transform.parent.gameObject.SetActive(false);
     }
 
     public void DisplayFilenameSelector()
     {
-        MazeSelector.gameObject.SetActive(true);
-        SelectorCloser.gameObject.SetActive(true);
+        mazeSelector.gameObject.SetActive(true);
+        selectorCloser.gameObject.SetActive(true);
 
         string[] filepaths = level.GetMazeFiles();
 
         foreach (string filepath in filepaths)
         {
             string filename = filepath.Substring(17);
-            Button button = Instantiate(FileButton, SelectorContent.transform) as Button;
+            Button button = Instantiate(fileButton, selectorContent.transform) as Button;
             button.onClick.AddListener(() => LoadFile(filename));
             Text buttonText = button.GetComponentInChildren<Text>();
             buttonText.text = filename;
@@ -135,40 +134,40 @@ public class PlayInitializer3D : MonoBehaviour
 
     public void CloseFilenameSelector()
     {
-        Button[] loadButtons = SelectorContent.GetComponentsInChildren<Button>();
+        Button[] loadButtons = selectorContent.GetComponentsInChildren<Button>();
         foreach (Button button in loadButtons) Destroy(button.gameObject);
 
-        SelectorCloser.gameObject.SetActive(false);
-        MazeSelector.gameObject.SetActive(false);
+        selectorCloser.gameObject.SetActive(false);
+        mazeSelector.gameObject.SetActive(false);
     }
 
     // deprecated
     public void DisplayLoadFilenameInput()
     {
-        LoadFilenameSetter.transform.parent.gameObject.SetActive(true);
+        loadFilenameSetter.transform.parent.gameObject.SetActive(true);
     }
 
     // deprecated
     public void CloseLoadInput()
     {
-        LoadFilenameSetter.transform.parent.gameObject.SetActive(false);
+        loadFilenameSetter.transform.parent.gameObject.SetActive(false);
     }
 
     public void SaveFile()
     {
-        string filename = SaveFilenameSetter.text;
+        string filename = saveFilenameSetter.text;
         if (filename == "") return;
-        SaveFilenameSetter.text = "";
-        SaveFilenameSetter.transform.parent.gameObject.SetActive(false);
+        saveFilenameSetter.text = "";
+        saveFilenameSetter.transform.parent.gameObject.SetActive(false);
         level.SaveMaze(filename);
     }
 
     public void LoadFile()
     {
         Debug.Log("loading a file...");
-        string filename = LoadFilenameSetter.text;
-        LoadFilenameSetter.text = "";
-        LoadFilenameSetter.transform.parent.gameObject.SetActive(false);
+        string filename = loadFilenameSetter.text;
+        loadFilenameSetter.text = "";
+        loadFilenameSetter.transform.parent.gameObject.SetActive(false);
         if (filename == "") return;
         level.LoadMaze(filename);
         CloseFilenameSelector();
@@ -211,8 +210,8 @@ public class PlayInitializer3D : MonoBehaviour
         int newHeight;
         int newWidth;
 
-        bool isHeightNumeric = int.TryParse(HeightSetter.text, out newHeight);
-        bool isWidthNumeric = int.TryParse(WidthSetter.text, out newWidth);
+        bool isHeightNumeric = int.TryParse(heightSetter.text, out newHeight);
+        bool isWidthNumeric = int.TryParse(widthSetter.text, out newWidth);
 
         if (!isHeightNumeric) newHeight = Maze.minHeight;
         else if (newHeight < Maze.minHeight) newHeight = Maze.minHeight;
@@ -243,10 +242,10 @@ public class PlayInitializer3D : MonoBehaviour
     {
         if (!level.Playable()) return;
         level.HideGraph();
-        MazeDisplay.gameObject.SetActive(false);
-        PlayDisplay.SetActive(true);
-        TopViewCam.enabled = false;
-        runner = Instantiate(RunnerTemplate) as GameRunner3D;
+        mazeDisplay.gameObject.SetActive(false);
+        playDisplay.SetActive(true);
+        topViewCam.enabled = false;
+        runner = Instantiate(runnerTemplate) as GameRunner3D;
         runner.Level = level;
         runner.initializer = this;
         runner.WinText = null;
@@ -255,9 +254,9 @@ public class PlayInitializer3D : MonoBehaviour
     public void StopPlaying()
     {
         if (runner == null) return;
-        MazeDisplay.gameObject.SetActive(true);
-        PlayDisplay.SetActive(false);
-        TopViewCam.enabled = true;
+        mazeDisplay.gameObject.SetActive(true);
+        playDisplay.SetActive(false);
+        topViewCam.enabled = true;
         Destroy(runner.gameObject);
     }
 
