@@ -4,17 +4,17 @@ using UnityEngine.UI;
 
 public abstract class GameRunner : MonoBehaviour {
 
-    protected Text _winText;
-    protected Maze _level;
-    protected TileScript[,] _grid;
-    private PlayerController _player;
-    private TileScript _endTile;
-    private DestinationScript _destination;
+    protected Text winText;
+    protected Maze level;
+    protected TileScript[,] grid;
+    private PlayerController player;
+    private TileScript endTile;
+    private DestinationScript destination;
 
     public DestinationScript Destination
     {
-        get { return _destination; }
-        protected set { _destination = value; }
+        get { return destination; }
+        protected set { destination = value; }
     }
 
     public PlayerController PlayerTemplate;
@@ -22,37 +22,37 @@ public abstract class GameRunner : MonoBehaviour {
 
     public Maze Level
     {
-        get { return _level; }
+        get { return level; }
         set
         {
             if (!value.Playable())
                 Debug.LogError("This level is not playable.", value);
             else
             {
-                _level = value;
-                _grid = value.Grid;
+                level = value;
+                grid = value.Grid;
             }
         }
     }
     public Text WinText
     {
-        get { return _winText; }
+        get { return winText; }
         set
         {
             if (value == null) return;
-            _winText = value;
-            _winText.gameObject.SetActive(false);
+            winText = value;
+            winText.gameObject.SetActive(false);
         }
     }
     public PlayerController Player
     {
-        get { return _player; }
-        protected set { _player = value; }
+        get { return player; }
+        protected set { player = value; }
     }
     public TileScript EndTile
     {
-        get { return _endTile; }
-        protected set { _endTile = value; }
+        get { return endTile; }
+        protected set { endTile = value; }
     }
 
     protected virtual void Start ()
@@ -76,6 +76,10 @@ public abstract class GameRunner : MonoBehaviour {
     protected abstract void PlacePlayer();
 
     protected abstract void PlaceDestintation();
+
+    protected abstract void PlacePowerups();
+
+    protected abstract void PlaceEnemies();
 
     public void GameWon()
     {

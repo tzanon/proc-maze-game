@@ -21,6 +21,8 @@ public class Maze : MonoBehaviour
     [HideInInspector]
     public TileScript startTile, endTile;
 
+    public Material startMaterial, endMaterial;
+
     public int Height
     {
         get
@@ -484,13 +486,11 @@ public class Maze : MonoBehaviour
 
     public void ShowGraph()
     {
-        /*
+        
         foreach (TileScript tile in Grid)
         {
-            //if (!graphTiles.Contains(tile)) tile.gameObject.SetActive(!tile.gameObject.activeSelf);
             tile.gameObject.SetActive(false);
         }
-        */
 
         HideGraph();
 
@@ -501,58 +501,43 @@ public class Maze : MonoBehaviour
         for (int i = 0; i < graphNodes.Length; i++)
         {
             nodeMarkers[i] = Instantiate(nodeMarker, graphNodes[i].WorldLocation, Quaternion.identity);
+            if (graphNodes[i].CorrespondingTile == this.startTile) nodeMarkers[i].GetComponent<MeshRenderer>().material = startMaterial;
+            if (graphNodes[i].CorrespondingTile == this.endTile) nodeMarkers[i].GetComponent<MeshRenderer>().material = endMaterial;
         }
 
         //edgeMarkers = new GameObject[graphRepresentation.Edges.Count];
-        
+
         Edge[] graphEdges = new Edge[graphRepresentation.Edges.Count];
         graphRepresentation.Edges.CopyTo(graphEdges);
 
         for (int i = 0; i < graphEdges.Length; i++)
         {
-            int edgeLength = graphEdges[i].Weight - 1;
-            // try with line renderers
-
             if (graphEdges[i].GetDirection() == Directions.North)
             {
-                //edgeMarkers[i] = Instantiate(edgeMarker, graphEdges[i].Node1.WorldLocation + Vector3.forward, Quaternion.identity);
-                Vector3 spawnLocation = graphEdges[i].Node1.WorldLocation + Vector3.forward;
-                for (int j = 0; j < graphEdges[i].Weight; j++)
-                {
-                    edgeMarkers.Add(Instantiate(edgeMarker, spawnLocation, Quaternion.identity));
-                    spawnLocation.z += 2f;
-                }
+                DrawEdge(graphEdges[i], Vector3.forward, Quaternion.identity);
             }
             else if (graphEdges[i].GetDirection() == Directions.South)
             {
-                //edgeMarkers[i] = Instantiate(edgeMarker, graphEdges[i].Node1.WorldLocation - Vector3.forward, Quaternion.identity);
-                Vector3 spawnLocation = graphEdges[i].Node1.WorldLocation - Vector3.forward;
-                for (int j = 0; j < graphEdges[i].Weight; j++)
-                {
-                    edgeMarkers.Add(Instantiate(edgeMarker, spawnLocation, Quaternion.identity));
-                    spawnLocation.z -= 2f;
-                }
+                DrawEdge(graphEdges[i], Vector3.back, Quaternion.identity);
             }
             else if (graphEdges[i].GetDirection() == Directions.East)
             {
-                //edgeMarkers[i] = Instantiate(edgeMarker, graphEdges[i].Node1.WorldLocation + Vector3.right, Quaternion.Euler(0, 90, 0));
-                Vector3 spawnLocation = graphEdges[i].Node1.WorldLocation + Vector3.right;
-                for (int j = 0; j < graphEdges[i].Weight; j++)
-                {
-                    edgeMarkers.Add(Instantiate(edgeMarker, spawnLocation, Quaternion.Euler(0, 90, 0)));
-                    spawnLocation.x += 2f;
-                }
+                DrawEdge(graphEdges[i], Vector3.right, Quaternion.Euler(0, 90, 0));
             }
             else
             {
-                //edgeMarkers[i] = Instantiate(edgeMarker, graphEdges[i].Node1.WorldLocation - Vector3.right, Quaternion.Euler(0, 90, 0));
-                Vector3 spawnLocation = graphEdges[i].Node1.WorldLocation - Vector3.right;
-                for (int j = 0; j < graphEdges[i].Weight; j++)
-                {
-                    edgeMarkers.Add(Instantiate(edgeMarker, spawnLocation, Quaternion.Euler(0, 90, 0)));
-                    spawnLocation.x -= 2f;
-                }
+                DrawEdge(graphEdges[i], Vector3.left, Quaternion.Euler(0, 90, 0));
             }
+        }
+    }
+
+    private void DrawEdge(Edge edge, Vector3 increment, Quaternion rotation)
+    {
+        Vector3 spawnLocation = edge.Node1.WorldLocation + increment;
+        for (int j = 0; j < edge.Weight; j++)
+        {
+            edgeMarkers.Add(Instantiate(edgeMarker, spawnLocation, rotation));
+            spawnLocation += 1.8f * increment;
         }
     }
 
@@ -586,7 +571,7 @@ public class Maze : MonoBehaviour
 
         foreach (Directions dir in Enum.GetValues(typeof(Directions)))
         {
-            if (!node.CorrespondingTile.WallActive(dir) && !node.HasNeighbour(dir))
+            if (!node.CorrespondingTile.WallActive(dir) && !node.HasNeighbourWithDirection(dir))
             {
                 Vector2 incrVector = directionVectors[dir];
 

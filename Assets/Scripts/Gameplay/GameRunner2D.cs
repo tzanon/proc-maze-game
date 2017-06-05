@@ -45,12 +45,22 @@ public class GameRunner2D : GameRunner
         Destination.transform.parent = EndTile.transform;
     }
 
+    protected override void PlacePowerups()
+    {
+
+    }
+
+    protected override void PlaceEnemies()
+    {
+
+    }
+
     private void TakeInput(KeyCode key, int newX, int newY)
     {
         if (Level.InBounds(newX, newY) &&
-            !_grid[Player.y, Player.x].WallsBetweenTilesExist(_grid[newY, newX]))
+            !grid[Player.y, Player.x].WallsBetweenTilesExist(grid[newY, newX]))
         {
-            UpdatePlayerPosition(_grid[newY, newX]);
+            UpdatePlayerPosition(grid[newY, newX]);
         }
     }
 

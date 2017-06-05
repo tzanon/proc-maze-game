@@ -6,75 +6,85 @@ public class Node
 
     private class NeighbourInfo
     {
-        private Node _neighbour;
-        private int _distance;
+        private Node neighbour;
+        private int distance;
 
         public Node Neighbour
         {
-            get { return _neighbour; }
+            get { return neighbour; }
         }
         public int Distance
         {
-            get { return _distance; }
+            get { return distance; }
         }
 
         public NeighbourInfo()
         {
-            _neighbour = null;
-            _distance = int.MaxValue;
+            neighbour = null;
+            distance = int.MaxValue;
+        }
+
+        public NeighbourInfo(Node neighbour, int distance)
+        {
+            this.neighbour = neighbour;
+            this.distance = distance;
         }
 
         public void SetNeighbour(Node neighbour, int distance)
         {
-            _neighbour = neighbour;
-            _distance = distance;
+            this.neighbour = neighbour;
+            this.distance = distance;
         }
 
     }
 
-    private TileScript _correspondingTile;
-    private Dictionary<Directions, NeighbourInfo> NeighbourInfos = new Dictionary<Directions, NeighbourInfo>();
+    private TileScript correspondingTile;
+    private Dictionary<Directions, NeighbourInfo> neighbourInfos = new Dictionary<Directions, NeighbourInfo>();
 
     public int X
     {
-        get { return _correspondingTile.X; }
+        get { return correspondingTile.X; }
     }
     public int Y
     {
-        get { return _correspondingTile.Y; }
+        get { return correspondingTile.Y; }
     }
     public TileScript CorrespondingTile
     {
-        get { return _correspondingTile; }
+        get { return correspondingTile; }
     }
     public Vector3 WorldLocation
     {
-        get { return _correspondingTile.transform.position; }
+        get { return correspondingTile.transform.position; }
     }
 
     public Node(TileScript tile)
     {
-        _correspondingTile = tile;
-        NeighbourInfos.Add(Directions.North, new NeighbourInfo());
-        NeighbourInfos.Add(Directions.East, new NeighbourInfo());
-        NeighbourInfos.Add(Directions.South, new NeighbourInfo());
-        NeighbourInfos.Add(Directions.West, new NeighbourInfo());
+        correspondingTile = tile;
     }
 
 	public void AddNeighbour(Node neighbour, Directions direction, int distance)
     {
-        NeighbourInfos[direction].SetNeighbour(neighbour, distance);
-        
+        neighbourInfos.Add(direction, new NeighbourInfo(neighbour, distance));
     }
 
-    public bool HasNeighbour(Directions direction)
+    public bool HasNeighbourWithDirection(Directions direction)
     {
-        return NeighbourInfos[direction].Neighbour != null;
+        return neighbourInfos.ContainsKey(direction);
     }
 
-    public Node GetNeighbour(Directions direction)
+    public Node NeighbourWithDirection(Directions direction)
     {
-        return NeighbourInfos[direction].Neighbour;
+        if (HasNeighbourWithDirection(direction)) return neighbourInfos[direction].Neighbour;
+        else return null;
+    }
+
+    public List<Node> Neighbours()
+    {
+        List<Node> neighbours = new List<Node>();
+        foreach (NeighbourInfo info in neighbourInfos.Values)
+            neighbours.Add(info.Neighbour);
+        return neighbours;
     }
 
     public bool EquivalentTo(Node other)

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class GameRunner3D : GameRunner {
 
@@ -24,6 +25,16 @@ public class GameRunner3D : GameRunner {
         Destination.transform.parent = EndTile.transform;
         Destination.Level = this.Level;
         Destination.Runner = this;
+    }
+
+    protected override void PlacePowerups()
+    {
+        
+    }
+
+    protected override void PlaceEnemies()
+    {
+        
     }
 
     public override void EndGame()
