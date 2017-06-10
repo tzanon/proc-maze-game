@@ -1,6 +1,7 @@
 ﻿
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class PlayInitializer3D : MonoBehaviour
 {
@@ -258,6 +259,20 @@ public class PlayInitializer3D : MonoBehaviour
         playDisplay.SetActive(false);
         topViewCam.enabled = true;
         Destroy(runner.gameObject);
+    }
+
+    public void PrintMazeSolution()
+    {
+        LinkedList<Node> path = level.SolveGraph();
+
+        //Debug.Log(path.ToString());
+
+        if (path == null) Debug.Log("no path exists");
+
+        foreach (Node node in path)
+        {
+            Debug.Log(node.ToString());
+        }
     }
 
 }

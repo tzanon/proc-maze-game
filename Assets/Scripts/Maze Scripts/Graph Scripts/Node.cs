@@ -4,7 +4,7 @@ using UnityEngine;
 public class Node
 {
 
-    private class NeighbourInfo
+    public class NeighbourInfo
     {
         private Node neighbour;
         private int distance;
@@ -79,11 +79,11 @@ public class Node
         else return null;
     }
 
-    public List<Node> Neighbours()
+    public List<NeighbourInfo> NeighbourInfos()
     {
-        List<Node> neighbours = new List<Node>();
+        List<NeighbourInfo> neighbours = new List<NeighbourInfo>();
         foreach (NeighbourInfo info in neighbourInfos.Values)
-            neighbours.Add(info.Neighbour);
+            neighbours.Add(info);
         return neighbours;
     }
 

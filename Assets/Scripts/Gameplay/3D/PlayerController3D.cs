@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class PlayerController3D : PlayerController {
+public class PlayerController3D : MonoBehaviour {
 
     [SerializeField]
     private float movementFactor, rotationFactor;

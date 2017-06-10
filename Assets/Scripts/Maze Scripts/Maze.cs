@@ -452,7 +452,7 @@ public class Maze : MonoBehaviour
 
     #endregion
 
-    #region graph making methods
+    #region graph-related methods
 
     public void ShowMaze()
     {
@@ -546,15 +546,20 @@ public class Maze : MonoBehaviour
         graphTiles.Clear();
         terminalTiles.Clear();
         graphRepresentation.Clear();
+
         foreach (TileScript tile in Grid)
         {
             if (!TileScript.CorridorCodes.Contains(tile.GetWallCode()))
             {
                 graphTiles.Add(tile);
-                graphRepresentation.AddNode(new Node(tile));
+                Node node = new Node(tile);
+                graphRepresentation.AddNode(node);
                 if (tile.GetNumActiveWalls() == 3) terminalTiles.Add(tile);
             }
         }
+
+        graphRepresentation.SetStartNodeAtPoint(startTile.X, startTile.Y);
+        graphRepresentation.SetEndNodeAtPoint(endTile.X, endTile.Y);
     }
 
     public void MakeGraph()
@@ -595,6 +600,11 @@ public class Maze : MonoBehaviour
                 if (graphRepresentation.AddEdge(edge)) addedEdges++;
             }
         }
+    }
+
+    public LinkedList<Node> SolveGraph()
+    {
+        return graphRepresentation.AStarSearch(graphRepresentation.StartNode, graphRepresentation.EndNode);
     }
 
     #endregion
