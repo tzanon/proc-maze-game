@@ -1,18 +1,22 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class TileScript3D : TileScript {
 
-    private MeshRenderer _meshRenderer;
+    private MeshRenderer meshRenderer;
 
     public Material StartingMaterial;
     public Material VisitedMaterial;
     public Material StackMaterial;
     public Material BeginMaterial;
     public Material EndMaterial;
+    public Material OpenMaterial;
+    public Material ClosedMaterial;
+    public Material SearchMaterial;
 
-    private const float _xWallPos = 0.45f, _yWallPos = 9.5f;
-
+    private const float xWallPos = 0.45f, yWallPos = 9.5f;
+    
     public override Vector3 StartingPosition
     {
         get
@@ -38,8 +42,8 @@ public class TileScript3D : TileScript {
     protected override void Awake()
     {
         base.Awake();
-        _meshRenderer = GetComponent<MeshRenderer>();
-        _meshRenderer.material = StartingMaterial;
+        meshRenderer = GetComponent<MeshRenderer>();
+        meshRenderer.material = StartingMaterial;
 
         CreateWalls();
     }
@@ -54,36 +58,51 @@ public class TileScript3D : TileScript {
         WallScript downWall = _walls[(int)Directions.South];
         WallScript leftWall = _walls[(int)Directions.West];
 
-        InitWall(Directions.North,    new Vector3(         0,  _yWallPos,  _xWallPos), new Vector3(90, 0, 0));
-        InitWall(Directions.East, new Vector3( _xWallPos,  _yWallPos,          0), new Vector3(90, 90, 0));
-        InitWall(Directions.South,  new Vector3(         0,  _yWallPos, -_xWallPos), new Vector3(90, 0, 0));
-        InitWall(Directions.West,  new Vector3(-_xWallPos,  _yWallPos,          0), new Vector3(90, 90, 0));
+        InitWall(Directions.North,    new Vector3(         0,  yWallPos,  xWallPos), new Vector3(90, 0, 0));
+        InitWall(Directions.East, new Vector3( xWallPos,  yWallPos,          0), new Vector3(90, 90, 0));
+        InitWall(Directions.South,  new Vector3(         0,  yWallPos, -xWallPos), new Vector3(90, 0, 0));
+        InitWall(Directions.West,  new Vector3(-xWallPos,  yWallPos,          0), new Vector3(90, 90, 0));
 
     }
 
     public override void Visit()
     {
-        _meshRenderer.material = VisitedMaterial;
+        meshRenderer.material = VisitedMaterial;
     }
 
     public override void OnStack()
     {
-        _meshRenderer.material = StackMaterial;
+        meshRenderer.material = StackMaterial;
     }
 
     public override void UnVisit()
     {
-        _meshRenderer.material = StartingMaterial;
+        meshRenderer.material = StartingMaterial;
     }
 
     public override void MakeStartTile()
     {
-        _meshRenderer.material = BeginMaterial;
+        meshRenderer.material = BeginMaterial;
     }
 
     public override void MakeEndTile()
     {
-        _meshRenderer.material = EndMaterial;
+        meshRenderer.material = EndMaterial;
+    }
+
+    public override void MakeOpen()
+    {
+        meshRenderer.material = OpenMaterial;
+    }
+
+    public override void MakeClosed()
+    {
+        meshRenderer.material = ClosedMaterial;
+    }
+
+    public override void SearchVisit()
+    {
+        meshRenderer.material = SearchMaterial;
     }
 
 }

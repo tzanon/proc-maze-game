@@ -265,14 +265,24 @@ public class PlayInitializer3D : MonoBehaviour
     {
         LinkedList<Node> path = level.SolveGraph();
 
-        //Debug.Log(path.ToString());
-
-        if (path == null) Debug.Log("no path exists");
-
-        foreach (Node node in path)
+        if (path == null)
         {
-            Debug.Log(node.ToString());
+            Debug.Log("no path exists");
         }
+        else
+        {
+            Debug.Log(path.ToString());
+            
+            foreach (Node node in path)
+            {
+                Debug.Log(node.ToString());
+            }
+        }
+    }
+
+    public void RunDFS()
+    {
+        level.DFS();
     }
 
 }

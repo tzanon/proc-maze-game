@@ -1,27 +1,29 @@
-﻿using System.Collections.Generic;
+﻿
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class Graph {
+public class Graph
+{
 
     private Dictionary<Vector2, Node> nodes;
     private HashSet<Edge> edges;
     private Node startNode, endNode;
+    private const float delay = 0.2f;
 
     public Node StartNode
     {
         get { return startNode; }
     }
-
     public Node EndNode
     {
         get { return endNode; }
     }
-
     public HashSet<Node> Nodes
     {
         get { return new HashSet<Node>(nodes.Values); }
     }
-
     public HashSet<Edge> Edges
     {
         get { return edges; }
@@ -56,9 +58,24 @@ public class Graph {
         return true;
     }
 
+    public bool HasNodeAtPoint(int x, int y)
+    {
+        return nodes.ContainsKey(new Vector2(x, y));
+    }
+
+    public bool HasNodeAtPoint(float x, float y)
+    {
+        return HasNodeAtPoint((int)x, (int)y);
+    }
+
     public Node GetNodeAtPoint(int x, int y)
     {
         return nodes[new Vector2(x, y)];
+    }
+
+    public Node GetNodeAtPoint(float x, float y)
+    {
+        return GetNodeAtPoint((int)x, (int)y);
     }
 
     public void SetStartNodeAtPoint(int x, int y)
@@ -69,6 +86,11 @@ public class Graph {
     public void SetEndNodeAtPoint(int x, int y)
     {
         endNode = nodes[new Vector2(x, y)];
+    }
+
+    public int DistanceBetweenNodes(Node node1, Node node2)
+    {
+        return ManhattanDistance(node1, node2);
     }
 
     private int ManhattanDistance(Node node1, Node node2)
@@ -98,6 +120,9 @@ public class Graph {
          * 
          */
 
+        Debug.Log("graph before searching");
+        DisplayInfo();
+
         HashSet<Node> openNodes = new HashSet<Node>();
         HashSet<Node> closedNodes = new HashSet<Node>();
 
@@ -105,10 +130,14 @@ public class Graph {
         Dictionary<Node, int> nodePathCosts = new Dictionary<Node, int>();
         Dictionary<Node, Node> cameFrom = new Dictionary<Node, Node>();
 
+        
+
         openNodes.Add(start);
         nodePathCosts.Add(start, 0);
         nodeScores.Add(start, ManhattanDistance(start, end));
         cameFrom.Add(start, null);
+        start.CorrespondingTile.MakeOpen();
+        Debug.Log("opened start node " + start.ToString());
 
         do
         {
@@ -123,7 +152,7 @@ public class Graph {
                 LinkedList<Node> path = new LinkedList<Node>();
                 path.AddLast(currentNode);
 
-                while (keys.Contains(currentNode))
+                while (keys.Contains(currentNode) && currentNode != null)
                 {
                     currentNode = cameFrom[currentNode];
                     path.AddLast(currentNode);
@@ -133,43 +162,81 @@ public class Graph {
 
             openNodes.Remove(currentNode); // 2. rmv from open, add to closed
             closedNodes.Add(currentNode);
+            currentNode.CorrespondingTile.MakeClosed();
+            Debug.Log("closed node " + currentNode.ToString());
 
-            List<Node.NeighbourInfo> infos = currentNode.NeighbourInfos();
-            foreach (Node.NeighbourInfo info in infos) // 3. for each of its neighbours
+            
+            List<Node> neighbours = currentNode.Neighbours;
+            foreach (Node neighbour in neighbours) // 3. for each of its neighbours
             {
-                if (closedNodes.Contains(info.Neighbour)) continue; // A. ignore neighbour if in closed list
+                if (closedNodes.Contains(neighbour)) continue; // A. ignore neighbour if in closed list
 
-                int pathCost = nodePathCosts[currentNode] + info.Distance;
-                int score = pathCost + ManhattanDistance(info.Neighbour, end);
+                int pathCost = nodePathCosts[currentNode] + DistanceBetweenNodes(currentNode, neighbour);//info.Distance;
+                int score = pathCost + ManhattanDistance(neighbour, end);
 
-                if (!openNodes.Contains(info.Neighbour)) // B. if not in open, add and compute score
+                if (!openNodes.Contains(neighbour)) // B. if not in open, add and compute score
                 {
-                    openNodes.Add(info.Neighbour);
+                    openNodes.Add(neighbour);
+                    neighbour.CorrespondingTile.MakeOpen();
+                    Debug.Log("opened node " + neighbour.ToString());
 
-                    nodePathCosts.Add(info.Neighbour, pathCost);
-                    nodeScores.Add(info.Neighbour, score);
+                    nodePathCosts.Add(neighbour, pathCost);
+                    nodeScores.Add(neighbour, score);
 
-                    cameFrom.Add(info.Neighbour, currentNode);
+                    cameFrom.Add(neighbour, currentNode);
                 }
 
                 // C. if in open, update best-cost path
-                if (openNodes.Contains(info.Neighbour) && pathCost < nodePathCosts[info.Neighbour])
+                if (openNodes.Contains(neighbour) && pathCost < nodePathCosts[neighbour])
                 {
                     //if (pathCost >= nodePathCosts[info.Neighbour]) continue; // not a better path
 
-                    nodePathCosts.Add(info.Neighbour, pathCost);
-                    nodeScores.Add(info.Neighbour, score);
+                    nodePathCosts.Add(neighbour, pathCost);
+                    nodeScores.Add(neighbour, score);
 
-                    cameFrom.Add(info.Neighbour, currentNode);
+                    cameFrom.Add(neighbour, currentNode);
                 }
             }
-            
-
         }
         while (openNodes.Count > 0);
 
+        Debug.Log("-----------------------------------");
+        Debug.Log("search ended");
 
         return null;
+    }
+
+    public void DisplayInfo()
+    {
+        Debug.Log("graph with " + Nodes.Count + " nodes and " + Edges.Count + " edges:");
+        Debug.Log("start is " + startNode.ToString());
+        Debug.Log("start's neighbour is " + startNode.Neighbours[0].ToString());
+        //Debug.Log("another neighbour is " + startNode.Neighbours[0].Neighbours[0].ToString());
+
+        foreach (Node node in Nodes)
+        {
+            Debug.Log(node.ToString());
+        }
+    }
+
+    public void DepthFirstSearch(Node startNode)
+    {
+        Stack<Node> nodeStack = new Stack<Node>();
+        Dictionary<Node, bool> discovered = new Dictionary<Node, bool>();
+
+        nodeStack.Push(startNode);
+
+        while (nodeStack.Count > 0)
+        {
+            Node node = nodeStack.Pop();
+            if (!discovered.ContainsKey(node))
+            {
+                discovered.Add(node, true);
+                node.CorrespondingTile.SearchVisit();
+                Debug.Log("Discovered node " + node.ToString());
+                foreach (Node neighbour in node.Neighbours) nodeStack.Push(neighbour);
+            }
+        }
     }
 
 }

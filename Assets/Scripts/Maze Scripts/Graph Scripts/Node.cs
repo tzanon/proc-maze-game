@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Node
 {
-
+    /*
     public class NeighbourInfo
     {
         private Node neighbour;
@@ -37,9 +37,10 @@ public class Node
         }
 
     }
+    */
 
     private TileScript correspondingTile;
-    private Dictionary<Directions, NeighbourInfo> neighbourInfos = new Dictionary<Directions, NeighbourInfo>();
+    private Dictionary<Directions, Node> neighbours = new Dictionary<Directions, Node>();
 
     public int X
     {
@@ -57,34 +58,35 @@ public class Node
     {
         get { return correspondingTile.transform.position; }
     }
+    public List<Node> Neighbours
+    {
+        get { return new List<Node>(neighbours.Values); }
+    }
 
     public Node(TileScript tile)
     {
         correspondingTile = tile;
     }
 
-	public void AddNeighbour(Node neighbour, Directions direction, int distance)
+	public void AddNeighbour(Node neighbour, Directions direction)
     {
-        neighbourInfos.Add(direction, new NeighbourInfo(neighbour, distance));
+        neighbours.Add(direction, neighbour);
     }
 
     public bool HasNeighbourWithDirection(Directions direction)
     {
-        return neighbourInfos.ContainsKey(direction);
+        return neighbours.ContainsKey(direction);
     }
 
     public Node NeighbourWithDirection(Directions direction)
     {
-        if (HasNeighbourWithDirection(direction)) return neighbourInfos[direction].Neighbour;
+        if (HasNeighbourWithDirection(direction)) return neighbours[direction];
         else return null;
     }
 
-    public List<NeighbourInfo> NeighbourInfos()
+    public int NumberNeighbours()
     {
-        List<NeighbourInfo> neighbours = new List<NeighbourInfo>();
-        foreach (NeighbourInfo info in neighbourInfos.Values)
-            neighbours.Add(info);
-        return neighbours;
+        return Neighbours.Count;
     }
 
     public bool EquivalentTo(Node other)
@@ -94,7 +96,14 @@ public class Node
 
     public override string ToString()
     {
-        return "(" + X + ", " + Y + ") at " + WorldLocation;
+        string nodeString = "(" + X + ", " + Y + ") with " + " neighbours: ";
+
+        foreach (Node neighbour in Neighbours)
+        {
+            nodeString += "(" + neighbour.X + ", " + neighbour.Y + ") ";
+        }
+
+        return nodeString;
     }
 
 }

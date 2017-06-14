@@ -88,4 +88,19 @@ public class TileScript2D : TileScript
         _spriteRenderer.sprite = EndSprite;
     }
 
+    public override void MakeOpen()
+    {
+        
+    }
+
+    public override void MakeClosed()
+    {
+        
+    }
+
+    public override void SearchVisit()
+    {
+
+    }
+
 }

@@ -172,4 +172,11 @@ public abstract class TileScript : MonoBehaviour {
 
     public abstract void MakeEndTile();
 
+    public abstract void MakeOpen();
+
+    public abstract void MakeClosed();
+
+    public abstract void SearchVisit();
+
+
 }

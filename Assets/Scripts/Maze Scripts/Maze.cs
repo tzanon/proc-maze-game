@@ -409,9 +409,14 @@ public class Maze : MonoBehaviour
         startTile = Grid[initY, initX];
         startTile.MakeStartTile();
 
+        int endY = -1;
+        int endX = -1;
+
+        /*
         // select some random tile at the last row for end tile
-        int endY = Grid.GetLength(0) - 1;
-        int endX = UnityEngine.Random.Range(0, Grid.GetLength(1));
+        endY = Grid.GetLength(0) - 1;
+        endX = UnityEngine.Random.Range(0, Grid.GetLength(1));
+        */
 
         // preferably, select a tile in the 1st or 2nd last rows with 3 walls for end tile
         for (int i = Grid.GetLength(0) - 2; i < Grid.GetLength(0); i++)
@@ -422,6 +427,22 @@ public class Maze : MonoBehaviour
                 {
                     endY = i;
                     endX = j;
+                }
+            }
+        }
+
+        // if not, any node
+        if (endY < 0 || endX < 0)
+        {
+            for (int i = Grid.GetLength(0) - 2; i < Grid.GetLength(0); i++)
+            {
+                for (int j = 0; j < Grid.GetLength(1); j++)
+                {
+                    if (Grid[i, j].GetNumActiveWalls() != 2)
+                    {
+                        endY = i;
+                        endX = j;
+                    }
                 }
             }
         }
@@ -568,43 +589,44 @@ public class Maze : MonoBehaviour
         {
             FindNodeNeighbours(node);
         }
-        Debug.Log("edges made: " + createdEdges + ", added: " + addedEdges);
+        //Debug.Log("edges made: " + createdEdges + ", added: " + addedEdges);
+        graphRepresentation.DisplayInfo();
     }
 
+    // problem likely in this method
     private void FindNodeNeighbours(Node node)
     {
 
         foreach (Directions dir in Enum.GetValues(typeof(Directions)))
         {
-            if (!node.CorrespondingTile.WallActive(dir) && !node.HasNeighbourWithDirection(dir))
+            if (node.CorrespondingTile.WallActive(dir) || node.HasNeighbourWithDirection(dir)) continue;
+
+            Vector2 incrVector = directionVectors[dir];
+            Vector2 neighbourCoordinates = new Vector2(node.X, node.Y);
+
+            do
             {
-                Vector2 incrVector = directionVectors[dir];
+                neighbourCoordinates += incrVector;
+            } while (!graphRepresentation.HasNodeAtPoint(neighbourCoordinates.x, neighbourCoordinates.y));
 
-                Vector2 currentVector = new Vector2(node.X, node.Y);
-                TileScript currentTile;
-                int distance = 0;
+            Node neighbour = graphRepresentation.GetNodeAtPoint(neighbourCoordinates.x, neighbourCoordinates.y);
+            node.AddNeighbour(neighbour, dir);
+            neighbour.AddNeighbour(node, TileScript.CorrespondingDirs[dir]);
 
-                do
-                {
-                    currentVector += incrVector;
-                    currentTile = Grid[(int)currentVector.y, (int)currentVector.x];
-                    distance++;
-                } while (!graphTiles.Contains(currentTile));
-
-                Node neighbour = new Node(currentTile);
-                node.AddNeighbour(neighbour, dir, distance);
-                neighbour.AddNeighbour(node, TileScript.CorrespondingDirs[dir], distance);
-
-                Edge edge = new Edge(node, neighbour);
-                createdEdges++;
-                if (graphRepresentation.AddEdge(edge)) addedEdges++;
-            }
+            Edge edge = new Edge(node, neighbour);
+            createdEdges++;
+            if (graphRepresentation.AddEdge(edge)) addedEdges++;
         }
     }
 
     public LinkedList<Node> SolveGraph()
     {
         return graphRepresentation.AStarSearch(graphRepresentation.StartNode, graphRepresentation.EndNode);
+    }
+
+    public void DFS()
+    {
+        graphRepresentation.DepthFirstSearch(graphRepresentation.StartNode);
     }
 
     #endregion
@@ -707,6 +729,7 @@ public class Maze : MonoBehaviour
                 endTile.MakeEndTile();
 
                 FindNodes();
+                MakeGraph();
             }
         }
         catch (IOException e)
