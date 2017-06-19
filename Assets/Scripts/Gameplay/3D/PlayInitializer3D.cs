@@ -10,6 +10,8 @@ public class PlayInitializer3D : MonoBehaviour
     public TileScript3D tileTemplate;
     public PlayerController3D playerTemplate;
 
+    public CanvasRenderer mazeOptions, graphOptions;
+
     public Canvas userInterfaceCanvas;
     public CanvasRenderer mazeDisplay;
     public GameObject playDisplay;
@@ -228,15 +230,29 @@ public class PlayInitializer3D : MonoBehaviour
         level.MakeBlankGrid(newHeight, newWidth);
         RepositionTopViewCam();
     }
-    
-    public void ShowGraphRep()
-    {
-        level.ShowGraph();
-    }
 
-    public void ShowMazeRep()
+
+    #region maze generation GUI
+
+
+
+    #endregion
+    
+
+    #region gameplay HUD
+
+
+
+    #endregion
+
+
+    #region maze playing options GUI
+
+    public void ShowGraphOptions()
     {
-        level.ShowMaze();
+        mazeOptions.gameObject.SetActive(false);
+        graphOptions.gameObject.SetActive(true);
+        level.ShowGraph();
     }
 
     public void PlayLevel()
@@ -261,28 +277,38 @@ public class PlayInitializer3D : MonoBehaviour
         Destroy(runner.gameObject);
     }
 
-    public void PrintMazeSolution()
+    public void SolveMazeLevel()
     {
-        LinkedList<Node> path = level.SolveGraph();
+        level.SolveMaze();
+    }
 
-        if (path == null)
-        {
-            Debug.Log("no path exists");
-        }
-        else
-        {
-            Debug.Log(path.ToString());
-            
-            foreach (Node node in path)
-            {
-                Debug.Log(node.ToString());
-            }
-        }
+    #endregion
+
+
+    #region graph options GUI
+
+    public void ShowMazeOptions()
+    {
+        mazeOptions.gameObject.SetActive(true);
+        graphOptions.gameObject.SetActive(false);
+        level.ShowMaze();
+    }
+
+    public void SolveGraphLevel()
+    {
+        level.SolveGraph();
     }
 
     public void RunDFS()
     {
         level.DFS();
     }
+
+    public void RunBFS()
+    {
+        level.BFS();
+    }
+
+    #endregion
 
 }

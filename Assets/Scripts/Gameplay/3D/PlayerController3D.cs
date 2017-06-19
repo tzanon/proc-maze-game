@@ -1,13 +1,14 @@
-﻿using UnityEngine;
+﻿
+using UnityEngine;
 
-public class PlayerController3D : MonoBehaviour {
+public class PlayerController3D : EntityController {
 
-    [SerializeField]
-    private float movementFactor, rotationFactor;
+    //private float movementFactor, rotationFactor;
 
 	void Start ()
     {
-	    
+        movementFactor = 2f;
+        rotationFactor = 85f;
 	}
 
 	void Update ()
@@ -23,7 +24,7 @@ public class PlayerController3D : MonoBehaviour {
 
         if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S))
         {
-            transform.position += -transform.forward * movementFactor * Time.deltaTime;
+            transform.position -= transform.forward * movementFactor * Time.deltaTime;
         }
 
         if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))

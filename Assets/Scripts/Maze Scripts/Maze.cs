@@ -5,7 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
-/**
+/*
  * C# naming conventions
  * camelCase for member vars, parameters, local vars
  * PascalCase for function, property, event, class names
@@ -21,7 +21,7 @@ public class Maze : MonoBehaviour
     [HideInInspector]
     public TileScript startTile, endTile;
 
-    public Material startMaterial, endMaterial;
+    public Material startMaterial, endMaterial, searchMaterial, discoveredMaterial, nodeMaterial;
 
     public int Height
     {
@@ -52,18 +52,22 @@ public class Maze : MonoBehaviour
 
     #region graph variables
 
-    // temp
-    int createdEdges = 0;
-    int addedEdges = 0;
-
-    public GameObject nodeMarker, edgeMarker;
-    private GameObject[] nodeMarkers; // edgeMarkers;
-    private HashSet<GameObject> edgeMarkers = new HashSet<GameObject>();
+    public MeshRenderer nodeMarker, edgeMarker;
+    private Dictionary<Vector2, MeshRenderer> nodeMarkers = new Dictionary<Vector2, MeshRenderer>();
+    private HashSet<MeshRenderer> edgeMarkers = new HashSet<MeshRenderer>();
 
     private Graph graphRepresentation = new Graph();
     private HashSet<TileScript> graphTiles = new HashSet<TileScript>(); //tiles representing nodes in a graph
     private HashSet<TileScript> terminalTiles = new HashSet<TileScript>(); //tiles with exactly 3 walls
-    private Dictionary<Directions, Vector2> directionVectors = new Dictionary<Directions, Vector2>();
+    private static Dictionary<Directions, Vector2> directionVectors = new Dictionary<Directions, Vector2>
+    {
+        { Directions.North, new Vector2(0, 1) },
+        { Directions.East, new Vector2(1, 0) },
+        { Directions.South, new Vector2(0, -1) },
+        { Directions.West, new Vector2(-1, 0) }
+    };
+
+    private Coroutine searchRoutine;
 
     #endregion
 
@@ -86,11 +90,6 @@ public class Maze : MonoBehaviour
         UpdateUnvisitedTiles();
         isGenerating = false;
         withDelay = true;
-
-        directionVectors.Add(Directions.North, new Vector2(0, 1));
-        directionVectors.Add(Directions.East, new Vector2(1, 0));
-        directionVectors.Add(Directions.South, new Vector2(0, -1));
-        directionVectors.Add(Directions.West, new Vector2(-1, 0));
     }
 
     #region general utility methods
@@ -473,7 +472,16 @@ public class Maze : MonoBehaviour
 
     #endregion
 
+
     #region graph-related methods
+
+    public void HideMaze()
+    {
+        foreach (TileScript tile in Grid)
+        {
+            tile.gameObject.SetActive(false);
+        }
+    }
 
     public void ShowMaze()
     {
@@ -484,49 +492,40 @@ public class Maze : MonoBehaviour
             tile.gameObject.SetActive(true);
         }
     }
-    
+
     public void HideGraph()
     {
-        if (nodeMarkers == null) return;
-        //Debug.Log("hiding graph");
+        if (searchRoutine != null) StopCoroutine(searchRoutine);
 
-        foreach (GameObject marker in nodeMarkers)
+        if (nodeMarkers == null) return;
+        foreach (MeshRenderer marker in nodeMarkers.Values)
         {
-            Destroy(marker);
+            Destroy(marker.gameObject);
         }
+        nodeMarkers.Clear();
 
         if (edgeMarkers == null) return;
-
-        foreach (GameObject marker in edgeMarkers)
+        foreach (MeshRenderer marker in edgeMarkers)
         {
-            Destroy(marker);
+            Destroy(marker.gameObject);
         }
-
         edgeMarkers.Clear();
     }
 
     public void ShowGraph()
     {
-        
-        foreach (TileScript tile in Grid)
-        {
-            tile.gameObject.SetActive(false);
-        }
+        HideMaze();
 
-        HideGraph();
-
-        nodeMarkers = new GameObject[graphRepresentation.Nodes.Count];
         Node[] graphNodes = new Node[graphRepresentation.Nodes.Count];
         graphRepresentation.Nodes.CopyTo(graphNodes);
 
         for (int i = 0; i < graphNodes.Length; i++)
         {
-            nodeMarkers[i] = Instantiate(nodeMarker, graphNodes[i].WorldLocation, Quaternion.identity);
-            if (graphNodes[i].CorrespondingTile == this.startTile) nodeMarkers[i].GetComponent<MeshRenderer>().material = startMaterial;
-            if (graphNodes[i].CorrespondingTile == this.endTile) nodeMarkers[i].GetComponent<MeshRenderer>().material = endMaterial;
+            MeshRenderer marker = Instantiate(nodeMarker, graphNodes[i].WorldLocation, Quaternion.identity);
+            nodeMarkers.Add(new Vector2(graphNodes[i].X, graphNodes[i].Y), marker);
         }
-
-        //edgeMarkers = new GameObject[graphRepresentation.Edges.Count];
+        nodeMarkers[new Vector2(startTile.X, startTile.Y)].material = startMaterial;
+        nodeMarkers[new Vector2(endTile.X, endTile.Y)].material = endMaterial;
 
         Edge[] graphEdges = new Edge[graphRepresentation.Edges.Count];
         graphRepresentation.Edges.CopyTo(graphEdges);
@@ -562,7 +561,7 @@ public class Maze : MonoBehaviour
         }
     }
 
-    public void FindNodes()
+    private void FindNodes()
     {
         graphTiles.Clear();
         terminalTiles.Clear();
@@ -583,17 +582,16 @@ public class Maze : MonoBehaviour
         graphRepresentation.SetEndNodeAtPoint(endTile.X, endTile.Y);
     }
 
-    public void MakeGraph()
+    private void MakeGraph()
     {
         foreach (Node node in graphRepresentation.Nodes)
         {
             FindNodeNeighbours(node);
         }
         //Debug.Log("edges made: " + createdEdges + ", added: " + addedEdges);
-        graphRepresentation.DisplayInfo();
+        //graphRepresentation.DisplayInfo();
     }
 
-    // problem likely in this method
     private void FindNodeNeighbours(Node node)
     {
 
@@ -614,26 +612,74 @@ public class Maze : MonoBehaviour
             neighbour.AddNeighbour(node, TileScript.CorrespondingDirs[dir]);
 
             Edge edge = new Edge(node, neighbour);
-            createdEdges++;
-            if (graphRepresentation.AddEdge(edge)) addedEdges++;
+            graphRepresentation.AddEdge(edge);
         }
     }
 
-    public LinkedList<Node> SolveGraph()
+    public void SolveMaze()
     {
-        return graphRepresentation.AStarSearch(graphRepresentation.StartNode, graphRepresentation.EndNode);
+
+    }
+
+    public void SolveGraph()
+    {
+        LinkedList<Node> path = graphRepresentation.ShortestPath;
+        searchRoutine = StartCoroutine(AnimSearch(new List<Node>(path)));
     }
 
     public void DFS()
     {
-        graphRepresentation.DepthFirstSearch(graphRepresentation.StartNode);
+        List<Node> searchSequence = graphRepresentation.DepthFirstSearch(graphRepresentation.StartNode);
+        searchRoutine = StartCoroutine(AnimSearch(searchSequence));
+    }
+
+    public void BFS()
+    {
+        List<Node> searchSequence = graphRepresentation.BreadthFirstSearch(graphRepresentation.StartNode);
+        searchRoutine = StartCoroutine(AnimSearch(searchSequence));
+    }
+
+    private IEnumerator AnimSearch(List<Node> searchSequence)
+    {
+
+        float searchDelay = Mathf.Log(searchSequence.Count, 10) / searchSequence.Count * 10f;
+        HashSet<Node> used = new HashSet<Node>();
+        HashSet<Node> discovered = new HashSet<Node>();
+
+        foreach (Node node in searchSequence)
+        {
+            nodeMarkers[new Vector2(node.X, node.Y)].material = searchMaterial;
+            used.Add(node);
+
+            yield return new WaitForSeconds(searchDelay);
+
+            foreach (Node neighbour in node.Neighbours)
+            {
+                if (!used.Contains(neighbour))
+                {
+                    nodeMarkers[new Vector2(neighbour.X, neighbour.Y)].material = discoveredMaterial;
+                    discovered.Add(neighbour);
+                }
+            }
+
+            yield return new WaitForSeconds(searchDelay);
+        }
+
+        yield return new WaitForSeconds(10 * searchDelay);
+
+        foreach (Node node in discovered)
+        {
+            nodeMarkers[new Vector2(node.X, node.Y)].material = nodeMaterial;
+        }
+        nodeMarkers[new Vector2(startTile.X, startTile.Y)].material = startMaterial;
+        nodeMarkers[new Vector2(endTile.X, endTile.Y)].material = endMaterial;
     }
 
     #endregion
 
     #region file IO methods
 
-    //all these need work...
+    // saves the current maze's info to a text file
     public void SaveMaze(string filename)
     {
         if (startTile == null || endTile == null || isGenerating || !GridExists()) return;
@@ -671,7 +717,7 @@ public class Maze : MonoBehaviour
         Debug.Log("File saved");
     }
 
-    // ***this should be in the scripts for the file loading screens
+    // gets list of all files for mazes
     public string[] GetMazeFiles()
     {
         return Directory.GetFiles(@"Assets\MazeFiles\", "*.txt");

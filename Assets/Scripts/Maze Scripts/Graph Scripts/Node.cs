@@ -3,41 +3,6 @@ using UnityEngine;
 
 public class Node
 {
-    /*
-    public class NeighbourInfo
-    {
-        private Node neighbour;
-        private int distance;
-
-        public Node Neighbour
-        {
-            get { return neighbour; }
-        }
-        public int Distance
-        {
-            get { return distance; }
-        }
-
-        public NeighbourInfo()
-        {
-            neighbour = null;
-            distance = int.MaxValue;
-        }
-
-        public NeighbourInfo(Node neighbour, int distance)
-        {
-            this.neighbour = neighbour;
-            this.distance = distance;
-        }
-
-        public void SetNeighbour(Node neighbour, int distance)
-        {
-            this.neighbour = neighbour;
-            this.distance = distance;
-        }
-
-    }
-    */
 
     private TileScript correspondingTile;
     private Dictionary<Directions, Node> neighbours = new Dictionary<Directions, Node>();
@@ -92,6 +57,23 @@ public class Node
     public bool EquivalentTo(Node other)
     {
         return (this.X == other.X && this.Y == other.Y);
+    }
+
+    // calculates distance this node and the other
+    public int DistanceBetween(Node other)
+    {
+        int horizDistance = Mathf.Abs(this.X - other.X);
+        int vertDistance = Mathf.Abs(this.Y - other.Y);
+        return horizDistance + vertDistance;
+    }
+
+    // calculates direction from this node to the other
+    public Directions DirectionBetween(Node other)
+    {
+        if (other.X - this.X > 0) return Directions.East;
+        if (other.X - this.X < 0) return Directions.West;
+        if (other.Y - this.Y > 0) return Directions.North;
+        else return Directions.South;
     }
 
     public override string ToString()
