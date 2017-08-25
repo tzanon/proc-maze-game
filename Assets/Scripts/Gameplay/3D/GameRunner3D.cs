@@ -5,8 +5,7 @@ public class GameRunner3D : GameRunner {
 
     [HideInInspector]
     public PlayInitializer3D initializer;
-
-    private const float _actorHeight = 1f;
+    private const float actorHeight = 1f;
 
     protected override void Start ()
     {
@@ -16,12 +15,12 @@ public class GameRunner3D : GameRunner {
 
     protected override void PlacePlayer()
     {
-        Player.transform.position = Level.startTile.transform.position + new Vector3(0, _actorHeight, 0);
+        Player.transform.position = Level.startTile.transform.position + new Vector3(0, actorHeight, 0);
     }
 
     protected override void PlaceDestintation()
     {
-        Destination = Instantiate(DestTemplate, EndTile.transform.position + new Vector3(0, 1, 0), Quaternion.identity) as DestinationScript;
+        Destination = Instantiate(destTemplate, EndTile.transform.position + new Vector3(0, 1, 0), Quaternion.identity) as DestinationScript;
         Destination.transform.parent = EndTile.transform;
         Destination.Level = this.Level;
         Destination.Runner = this;

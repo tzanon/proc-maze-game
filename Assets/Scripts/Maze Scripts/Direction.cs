@@ -1,5 +1,5 @@
 ﻿
-public enum Directions
+public enum Direction
 {
     North,
     East,

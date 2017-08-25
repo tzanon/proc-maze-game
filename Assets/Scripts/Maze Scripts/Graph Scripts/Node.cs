@@ -5,7 +5,7 @@ public class Node
 {
 
     private TileScript correspondingTile;
-    private Dictionary<Directions, Node> neighbours = new Dictionary<Directions, Node>();
+    private Dictionary<Direction, Node> neighbours = new Dictionary<Direction, Node>();
 
     public int X
     {
@@ -33,17 +33,17 @@ public class Node
         correspondingTile = tile;
     }
 
-	public void AddNeighbour(Node neighbour, Directions direction)
+	public void AddNeighbour(Node neighbour, Direction direction)
     {
         neighbours.Add(direction, neighbour);
     }
 
-    public bool HasNeighbourWithDirection(Directions direction)
+    public bool HasNeighbourWithDirection(Direction direction)
     {
         return neighbours.ContainsKey(direction);
     }
 
-    public Node NeighbourWithDirection(Directions direction)
+    public Node NeighbourWithDirection(Direction direction)
     {
         if (HasNeighbourWithDirection(direction)) return neighbours[direction];
         else return null;
@@ -68,12 +68,12 @@ public class Node
     }
 
     // calculates direction from this node to the other
-    public Directions DirectionBetween(Node other)
+    public Direction DirectionBetween(Node other)
     {
-        if (other.X - this.X > 0) return Directions.East;
-        if (other.X - this.X < 0) return Directions.West;
-        if (other.Y - this.Y > 0) return Directions.North;
-        else return Directions.South;
+        if (other.X - this.X > 0) return Direction.East;
+        if (other.X - this.X < 0) return Direction.West;
+        if (other.Y - this.Y > 0) return Direction.North;
+        else return Direction.South;
     }
 
     public override string ToString()

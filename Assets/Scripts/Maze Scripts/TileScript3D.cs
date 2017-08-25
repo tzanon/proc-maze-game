@@ -16,7 +16,7 @@ public class TileScript3D : TileScript {
     public Material SearchMaterial;
 
     private const float xWallPos = 0.45f, yWallPos = 9.5f;
-    
+
     public override Vector3 StartingPosition
     {
         get
@@ -50,18 +50,18 @@ public class TileScript3D : TileScript {
 
     protected override void CreateWalls()
     {
-        _wallDirs.Clear();
-        _correspondingWallDirs.Clear();
+        wallDirs.Clear();
+        correspondingWallDirs.Clear();
 
-        WallScript upWall = _walls[(int)Directions.North];
-        WallScript rightWall = _walls[(int)Directions.East];
-        WallScript downWall = _walls[(int)Directions.South];
-        WallScript leftWall = _walls[(int)Directions.West];
+        WallScript upWall = walls[(int)Direction.North];
+        WallScript rightWall = walls[(int)Direction.East];
+        WallScript downWall = walls[(int)Direction.South];
+        WallScript leftWall = walls[(int)Direction.West];
 
-        InitWall(Directions.North,    new Vector3(         0,  yWallPos,  xWallPos), new Vector3(90, 0, 0));
-        InitWall(Directions.East, new Vector3( xWallPos,  yWallPos,          0), new Vector3(90, 90, 0));
-        InitWall(Directions.South,  new Vector3(         0,  yWallPos, -xWallPos), new Vector3(90, 0, 0));
-        InitWall(Directions.West,  new Vector3(-xWallPos,  yWallPos,          0), new Vector3(90, 90, 0));
+        InitWall(Direction.North,    new Vector3(         0,  yWallPos,  xWallPos), new Vector3(90, 0, 0));
+        InitWall(Direction.East, new Vector3( xWallPos,  yWallPos,          0), new Vector3(90, 90, 0));
+        InitWall(Direction.South,  new Vector3(         0,  yWallPos, -xWallPos), new Vector3(90, 0, 0));
+        InitWall(Direction.West,  new Vector3(-xWallPos,  yWallPos,          0), new Vector3(90, 90, 0));
 
     }
 

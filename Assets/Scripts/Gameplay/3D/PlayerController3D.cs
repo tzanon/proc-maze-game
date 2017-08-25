@@ -1,47 +1,43 @@
-﻿
-using UnityEngine;
+﻿using UnityEngine;
 
-public class PlayerController3D : EntityController {
+public class PlayerController3D : PlayerController
+{
 
-    //private float movementFactor, rotationFactor;
+    private const int MaxAmmo = 5; // format for constants?
+    private int ammo;
 
-	void Start ()
+	protected override void Start ()
     {
         movementFactor = 2f;
         rotationFactor = 85f;
 	}
-
-	void Update ()
+    
+	protected override void Update ()
     {
         
-        float currentRot = transform.rotation.eulerAngles.y;
-        Vector3 direction = new Vector3(Mathf.Sin(currentRot), 0, Mathf.Cos(currentRot)).normalized;
-
-        if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
-        {
-            transform.position += transform.forward * movementFactor * Time.deltaTime;
-        }
-
-        if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S))
-        {
-            transform.position -= transform.forward * movementFactor * Time.deltaTime;
-        }
-
-        if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))
-        {
-            transform.Rotate(0, rotationFactor * Time.deltaTime, 0);
-        }
-
-        if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
-        {
-            transform.Rotate(0, -rotationFactor * Time.deltaTime, 0);
-        }
     }
 
     void FixedUpdate()
     {
-        
+        if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
+        {
+            MoveForward();
+        }
 
+        if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S))
+        {
+            MoveBackward();
+        }
+
+        if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))
+        {
+            RotateRight();
+        }
+
+        if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
+        {
+            RotateLeft();
+        }
     }
 
 }

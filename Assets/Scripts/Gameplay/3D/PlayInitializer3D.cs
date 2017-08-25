@@ -1,7 +1,5 @@
-﻿
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
 
 public class PlayInitializer3D : MonoBehaviour
 {
@@ -50,14 +48,6 @@ public class PlayInitializer3D : MonoBehaviour
 
         level = Instantiate(mazeTemplate) as Maze;
         level.withDelay = true;
-
-        /*
-        player = Instantiate(PlayerTemplate, new Vector3(-12, 1, 0), Quaternion.identity) as PlayerController3D;
-        playerCamera = player.GetComponent<Camera>();
-
-        TopViewCam.enabled = true;
-        playerCamera.enabled = false;
-        */
 
         level.MakeBlankGrid(15, 15);
 

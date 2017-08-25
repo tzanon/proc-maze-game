@@ -9,7 +9,7 @@ public class Graph
     private Dictionary<Vector2, Node> nodes;
     private HashSet<Edge> edges;
     private Node startNode, endNode;
-    private LinkedList<Node> shortestPath;
+    private NodePath shortestPath;
 
     public Node StartNode
     {
@@ -27,13 +27,12 @@ public class Graph
     {
         get { return edges; }
     }
-    public LinkedList<Node> ShortestPath
+    public NodePath ShortestPath
     {
         get
         {
-            if (shortestPath.Count <= 0)
+            if (shortestPath == null || shortestPath.Count <= 0)
             {
-                shortestPath.Clear();
                 shortestPath = AStarSearch(startNode, endNode);
             }
             return shortestPath;
@@ -44,14 +43,13 @@ public class Graph
     {
         nodes = new Dictionary<Vector2, Node>();
         edges = new HashSet<Edge>();
-        shortestPath = new LinkedList<Node>();
     }
 
     public void Clear()
     {
         startNode = null;
         endNode = null;
-        shortestPath.Clear();
+        shortestPath = null;
         nodes.Clear();
         edges.Clear();
     }
@@ -113,23 +111,8 @@ public class Graph
     }
 
     // finds the shortest path between two given nodes
-    public LinkedList<Node> AStarSearch(Node start, Node end)
+    public NodePath AStarSearch(Node start, Node end)
     {
-        /*
-         * look up computerphile video
-         * A*
-         * need 2 lists:
-         * open list - nodes being considered for path
-         * closed list - nodes not being considered again
-         * give each node a score G + H
-         *   G - cost from start to current node
-         *   H - est. cost from curr node to destination (heuristic)
-         * 
-         */
-
-        Debug.Log("graph before searching");
-        DisplayInfo();
-
         HashSet<Node> openNodes = new HashSet<Node>();
         HashSet<Node> closedNodes = new HashSet<Node>();
 
@@ -141,8 +124,6 @@ public class Graph
         nodePathCosts.Add(start, 0);
         nodeScores.Add(start, ManhattanDistance(start, end));
         cameFrom.Add(start, null);
-        //start.CorrespondingTile.MakeOpen();
-        Debug.Log("opened start node " + start.ToString());
 
         do
         {
@@ -164,14 +145,11 @@ public class Graph
 
                 path.Reverse();
                 LinkedList<Node> linkedPath = new LinkedList<Node>(path);
-                return linkedPath;
+                return new NodePath(linkedPath);
             }
 
             openNodes.Remove(currentNode); // rmv from open, add to closed
             closedNodes.Add(currentNode);
-            //currentNode.CorrespondingTile.MakeClosed();
-            Debug.Log("closed node " + currentNode.ToString());
-
             
             List<Node> neighbours = currentNode.Neighbours;
             foreach (Node neighbour in neighbours) // for each of its neighbours
@@ -184,8 +162,6 @@ public class Graph
                 if (!openNodes.Contains(neighbour)) // if not in open, add and compute score
                 {
                     openNodes.Add(neighbour);
-                    //neighbour.CorrespondingTile.MakeOpen();
-                    Debug.Log("opened node " + neighbour.ToString());
 
                     nodePathCosts.Add(neighbour, pathCost);
                     nodeScores.Add(neighbour, score);
@@ -206,9 +182,6 @@ public class Graph
             }
         }
         while (openNodes.Count > 0);
-
-        Debug.Log("-----------------------------------");
-        Debug.Log("search ended");
 
         return null;
     }

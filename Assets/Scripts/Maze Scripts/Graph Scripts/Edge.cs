@@ -60,17 +60,17 @@ public class Edge {
         }
     }
 
-    public Directions GetDirection()
+    public Direction GetDirection()
     {
         if (Node1.X == Node2.X)
         {
-            if (Node1.Y < Node2.Y) return Directions.North;
-            else return Directions.South;
+            if (Node1.Y < Node2.Y) return Direction.North;
+            else return Direction.South;
         }
         else
         {
-            if (Node1.X < Node2.X) return Directions.East;
-            else return Directions.West;
+            if (Node1.X < Node2.X) return Direction.East;
+            else return Direction.West;
         }
     }
     

@@ -48,18 +48,18 @@ public class TileScript2D : TileScript
 
     protected override void CreateWalls()
     {
-        _wallDirs.Clear();
-        _correspondingWallDirs.Clear();
+        wallDirs.Clear();
+        correspondingWallDirs.Clear();
 
-        WallScript upWall = _walls[(int)Directions.North];
-        WallScript rightWall = _walls[(int)Directions.East];
-        WallScript downWall = _walls[(int)Directions.South];
-        WallScript leftWall = _walls[(int)Directions.West];
+        WallScript upWall = walls[(int)Direction.North];
+        WallScript rightWall = walls[(int)Direction.East];
+        WallScript downWall = walls[(int)Direction.South];
+        WallScript leftWall = walls[(int)Direction.West];
 
-        InitWall(Directions.North,    new Vector3(        0,  _wallPos,    0),           Vector3.zero);
-        InitWall(Directions.East, new Vector3( _wallPos,         0,    0),  new Vector3(0, 0, 90));
-        InitWall(Directions.South,  new Vector3(        0, -_wallPos,    0),           Vector3.zero);
-        InitWall(Directions.West,  new Vector3(-_wallPos,         0,    0),  new Vector3(0, 0, 90));
+        InitWall(Direction.North,    new Vector3(        0,  _wallPos,    0),           Vector3.zero);
+        InitWall(Direction.East, new Vector3( _wallPos,         0,    0),  new Vector3(0, 0, 90));
+        InitWall(Direction.South,  new Vector3(        0, -_wallPos,    0),           Vector3.zero);
+        InitWall(Direction.West,  new Vector3(-_wallPos,         0,    0),  new Vector3(0, 0, 90));
 
     }
 

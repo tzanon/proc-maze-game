@@ -2,7 +2,8 @@
 using System.Collections;
 using UnityEngine.UI;
 
-public abstract class GameRunner : MonoBehaviour {
+public abstract class GameRunner : MonoBehaviour
+{
 
     protected Text winText;
     protected Maze level;
@@ -17,8 +18,8 @@ public abstract class GameRunner : MonoBehaviour {
         protected set { destination = value; }
     }
 
-    public PlayerController PlayerTemplate;
-    public DestinationScript DestTemplate;
+    public PlayerController playerTemplate;
+    public DestinationScript destTemplate;
 
     public Maze Level
     {
@@ -57,9 +58,11 @@ public abstract class GameRunner : MonoBehaviour {
 
     protected virtual void Start ()
     {
-        Debug.Log("start tile is " + Level.startTile);
-        Player = Instantiate(PlayerTemplate) as PlayerController;
-        EndTile = Level.endTile;
+        Debug.Log("start tile is " + level.startTile);
+        player = Instantiate(playerTemplate) as PlayerController;
+        player.MazeGraph = level.GraphRepresentation;
+
+        EndTile = level.endTile;
         PlaceDestintation();
         PlacePlayer();
     }
@@ -88,7 +91,7 @@ public abstract class GameRunner : MonoBehaviour {
 
     public virtual void EndGame()
     {
-        Destroy(Player.gameObject);
+        Destroy(player.gameObject);
         Destroy(Destination);
     }
 

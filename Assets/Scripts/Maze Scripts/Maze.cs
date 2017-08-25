@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿
+using UnityEngine;
 using UnityEngine.UI;
 using System;
 using System.Collections;
@@ -20,6 +21,7 @@ public class Maze : MonoBehaviour
     private TileScript[,] grid;
     [HideInInspector]
     public TileScript startTile, endTile;
+    public SolverController solverTemplate;
 
     public Material startMaterial, endMaterial, searchMaterial, discoveredMaterial, nodeMaterial;
 
@@ -59,15 +61,20 @@ public class Maze : MonoBehaviour
     private Graph graphRepresentation = new Graph();
     private HashSet<TileScript> graphTiles = new HashSet<TileScript>(); //tiles representing nodes in a graph
     private HashSet<TileScript> terminalTiles = new HashSet<TileScript>(); //tiles with exactly 3 walls
-    private static Dictionary<Directions, Vector2> directionVectors = new Dictionary<Directions, Vector2>
+    private static Dictionary<Direction, Vector2> directionVectors = new Dictionary<Direction, Vector2>
     {
-        { Directions.North, new Vector2(0, 1) },
-        { Directions.East, new Vector2(1, 0) },
-        { Directions.South, new Vector2(0, -1) },
-        { Directions.West, new Vector2(-1, 0) }
+        { Direction.North, new Vector2(0, 1) },
+        { Direction.East, new Vector2(1, 0) },
+        { Direction.South, new Vector2(0, -1) },
+        { Direction.West, new Vector2(-1, 0) }
     };
 
     private Coroutine searchRoutine;
+
+    public Graph GraphRepresentation
+    {
+        get { return graphRepresentation; }
+    }
 
     #endregion
 
@@ -76,7 +83,7 @@ public class Maze : MonoBehaviour
     public Text stackCount;
     public Text setCount;
 
-    private const float delay = 0.025f; // delay for "animation"
+    private const float delay = 0.1f; // delay for "animation"
     private bool isGenerating;
     private Stack<TileScript> tileStack = new Stack<TileScript>();
     private HashSet<TileScript> unvisitedTiles = new HashSet<TileScript>();
@@ -235,6 +242,14 @@ public class Maze : MonoBehaviour
     public bool Playable()
     {
         return (!isGenerating && GridContains(startTile) && GridContains(endTile));
+    }
+
+    // spawns a bot to solve the maze
+    public void SolveMaze()
+    {
+        SolverController solver = Instantiate(solverTemplate, startTile.transform.position, Quaternion.identity);
+        solver.InitializeBot(graphRepresentation);
+        solver.TraversePath();
     }
 
     public void DisplayCoordinates()
@@ -472,7 +487,6 @@ public class Maze : MonoBehaviour
 
     #endregion
 
-
     #region graph-related methods
 
     public void HideMaze()
@@ -532,15 +546,15 @@ public class Maze : MonoBehaviour
 
         for (int i = 0; i < graphEdges.Length; i++)
         {
-            if (graphEdges[i].GetDirection() == Directions.North)
+            if (graphEdges[i].GetDirection() == Direction.North)
             {
                 DrawEdge(graphEdges[i], Vector3.forward, Quaternion.identity);
             }
-            else if (graphEdges[i].GetDirection() == Directions.South)
+            else if (graphEdges[i].GetDirection() == Direction.South)
             {
                 DrawEdge(graphEdges[i], Vector3.back, Quaternion.identity);
             }
-            else if (graphEdges[i].GetDirection() == Directions.East)
+            else if (graphEdges[i].GetDirection() == Direction.East)
             {
                 DrawEdge(graphEdges[i], Vector3.right, Quaternion.Euler(0, 90, 0));
             }
@@ -571,7 +585,8 @@ public class Maze : MonoBehaviour
         {
             if (!TileScript.CorridorCodes.Contains(tile.GetWallCode()))
             {
-                graphTiles.Add(tile);
+                SetTileAsNode(tile);
+
                 Node node = new Node(tile);
                 graphRepresentation.AddNode(node);
                 if (tile.GetNumActiveWalls() == 3) terminalTiles.Add(tile);
@@ -580,6 +595,16 @@ public class Maze : MonoBehaviour
 
         graphRepresentation.SetStartNodeAtPoint(startTile.X, startTile.Y);
         graphRepresentation.SetEndNodeAtPoint(endTile.X, endTile.Y);
+    }
+
+    private void SetTileAsNode(TileScript tile)
+    {
+        graphTiles.Add(tile);
+        tile.tag = "NodeTile";
+        BoxCollider playerDetector = tile.gameObject.AddComponent<BoxCollider>();
+        playerDetector.isTrigger = true;
+        playerDetector.center = new Vector3(0, 4, 0);
+        playerDetector.size = new Vector3(1, 8, 1);
     }
 
     private void MakeGraph()
@@ -595,7 +620,7 @@ public class Maze : MonoBehaviour
     private void FindNodeNeighbours(Node node)
     {
 
-        foreach (Directions dir in Enum.GetValues(typeof(Directions)))
+        foreach (Direction dir in Enum.GetValues(typeof(Direction)))
         {
             if (node.CorrespondingTile.WallActive(dir) || node.HasNeighbourWithDirection(dir)) continue;
 
@@ -616,15 +641,10 @@ public class Maze : MonoBehaviour
         }
     }
 
-    public void SolveMaze()
-    {
-
-    }
-
     public void SolveGraph()
     {
-        LinkedList<Node> path = graphRepresentation.ShortestPath;
-        searchRoutine = StartCoroutine(AnimSearch(new List<Node>(path)));
+        NodePath path = graphRepresentation.ShortestPath;
+        searchRoutine = StartCoroutine(AnimSearch(path.ListRepresentation));
     }
 
     public void DFS()

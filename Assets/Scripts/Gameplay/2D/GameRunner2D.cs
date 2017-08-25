@@ -41,7 +41,7 @@ public class GameRunner2D : GameRunner
 
     protected override void PlaceDestintation()
     {
-        Destination = Instantiate(DestTemplate, EndTile.transform.position, Quaternion.identity) as DestinationScript;
+        Destination = Instantiate(destTemplate, EndTile.transform.position, Quaternion.identity) as DestinationScript;
         Destination.transform.parent = EndTile.transform;
     }
 
