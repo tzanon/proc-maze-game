@@ -1,0 +1,200 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="GameManager" Collapsed="true">
+    <Position X="15.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAEA=</HashCode>
+      <FileName>Assets\Scripts\Game Management\Game Manager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PlayLevelManager" Collapsed="true">
+    <Position X="13.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAABAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAEA=</HashCode>
+      <FileName>Assets\Scripts\Game Management\PlayLevelManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GameRunner2D" Collapsed="true">
+    <Position X="5.5" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAACGAQACAAAAAAAAAAAAQCAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Gameplay\2D\GameRunner2D.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GameRunner3D" Collapsed="true">
+    <Position X="7.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACGAAACAAAAAAAAAAAAQAAAAAAAAEAAAwAAA=</HashCode>
+      <FileName>Assets\Scripts\Gameplay\3D\GameRunner3D.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PlayerController3D" Collapsed="true">
+    <Position X="2.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAiAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAA=</HashCode>
+      <FileName>Assets\Scripts\Gameplay\3D\PlayerController3D.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PlayInitializer3D" Collapsed="true">
+    <Position X="12" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>kAEiIAAIAOZAAAEVAAQwSALEBAHkgABBFZAwCGBQBEA=</HashCode>
+      <FileName>Assets\Scripts\Gameplay\3D\PlayInitializer3D.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BotController" Collapsed="true">
+    <Position X="0.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQBAAAAACiAAAAQAAgIAAAAAAAARAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Gameplay\BotController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EntityController" Collapsed="true">
+    <Position X="1.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAgAACAAAAAAABAAgAEAAAAAQAAAEAAAIAA=</HashCode>
+      <FileName>Assets\Scripts\Gameplay\EntityController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GameRunner" Collapsed="true">
+    <Position X="6.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAYAAAAACGIAACAAAgAAAiIAAAUgAAAFEAEABQAQAAA=</HashCode>
+      <FileName>Assets\Scripts\Gameplay\GameRunner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PlayerController" Collapsed="true">
+    <Position X="2.75" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Gameplay\PlayerController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SolverController" Collapsed="true">
+    <Position X="0.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Gameplay\SolverController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DestinationScript" Collapsed="true">
+    <Position X="10.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAACAAAAAAAAAAAAAAAAAAAAABQAAAQAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Maze Scripts\DestinationScript.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DirectionInfo" Collapsed="true">
+    <Position X="12" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QACAAAAAAAAACAAAAAAAAABAAAAAAAAAQAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Maze Scripts\DirectionInfo.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Edge" Collapsed="true">
+    <Position X="13.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABABAAABBIAAEEAAAgAAAAACAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Maze Scripts\Graph Scripts\Edge.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Graph" Collapsed="true">
+    <Position X="10.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AiAggAIAAYAAEAEACQAAAAAAAAAAAAAAAAAIABBYKCE=</HashCode>
+      <FileName>Assets\Scripts\Maze Scripts\Graph Scripts\Graph.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Node" Collapsed="true">
+    <Position X="15.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAgAAAAAAAAAGkAAAAgAgAAAABIAAAAAAAAAAEaAA=</HashCode>
+      <FileName>Assets\Scripts\Maze Scripts\Graph Scripts\Node.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NodePath" Collapsed="true">
+    <Position X="10.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAAAAABAAAIAACBAQAAAAQAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Maze Scripts\Graph Scripts\NodePath.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Maze" Collapsed="true">
+    <Position X="12" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EoHUAkEQJyoAgAiCRIXJBmpMAAIQCBAoRQAIUAIACKM=</HashCode>
+      <FileName>Assets\Scripts\Maze Scripts\Maze.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MazeGenerator" Collapsed="true">
+    <Position X="13.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAgAAAAAAAAAAAAAAACAIAAAA=</HashCode>
+      <FileName>Assets\Scripts\Maze Scripts\MazeGenerator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TesterScript" Collapsed="true">
+    <Position X="10.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAAAIAAAAAAAAAEAAAAQ=</HashCode>
+      <FileName>Assets\Scripts\Maze Scripts\TesterScript.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TileScript" Collapsed="true">
+    <Position X="1.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>kAAgAAUQACAAxCwOAAQBCAFAAAAAIGCQgIgCAAAA4EA=</HashCode>
+      <FileName>Assets\Scripts\Maze Scripts\TileScript.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TileScript2D" Collapsed="true">
+    <Position X="2.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>kAIAAgAgCAAAhAQCAAAACABAAAAAAASAAAgCDAAAgEA=</HashCode>
+      <FileName>Assets\Scripts\Maze Scripts\TileScript2D.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TileScript3D" Collapsed="true">
+    <Position X="0.5" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>kAAAAAAAAAEAhAyCIQAJCABAAAAAAAGIAAgCAgAAgEA=</HashCode>
+      <FileName>Assets\Scripts\Maze Scripts\TileScript3D.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WallScript" Collapsed="true">
+    <Position X="13.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Maze Scripts\WallScript.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SceneLoader" Collapsed="true">
+    <Position X="15.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAABAAAIAAAAAAgAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Menu Navigation\SceneLoader.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TestScript" Collapsed="true">
+    <Position X="12" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAACBABAAQAAQhAEIAAAFEEABAAAAAAEAAAAg=</HashCode>
+      <FileName>Assets\Scripts\TestScript.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="Direction" Collapsed="true">
+    <Position X="10.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAABAAQ=</HashCode>
+      <FileName>Assets\Scripts\Maze Scripts\Direction.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Delegate Name="MovementAction" Collapsed="true">
+    <Position X="10.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Gameplay\BotController.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

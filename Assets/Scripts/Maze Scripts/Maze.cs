@@ -1,5 +1,4 @@
-﻿
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System;
 using System.Collections;
@@ -20,7 +19,7 @@ public class Maze : MonoBehaviour
     public TileScript tileTemplate;
     private TileScript[,] grid;
     [HideInInspector]
-    public TileScript startTile, endTile;
+    private TileScript startTile, endTile;
     public SolverController solverTemplate;
 
     public Material startMaterial, endMaterial, searchMaterial, discoveredMaterial, nodeMaterial;
@@ -51,6 +50,16 @@ public class Maze : MonoBehaviour
     public const int minHeight = 6, minWidth = 6, maxHeight = 32, maxWidth = 32;
 
     public bool withDelay;
+
+    public TileScript StartTile
+    {
+        get { return startTile; }
+    }
+
+    public TileScript EndTile
+    {
+        get { return endTile; }
+    }
 
     #region graph variables
 
@@ -83,7 +92,7 @@ public class Maze : MonoBehaviour
     public Text stackCount;
     public Text setCount;
 
-    private const float delay = 0.1f; // delay for "animation"
+    private const float delay = 0.05f; // delay for "animation"
     private bool isGenerating;
     private Stack<TileScript> tileStack = new Stack<TileScript>();
     private HashSet<TileScript> unvisitedTiles = new HashSet<TileScript>();
@@ -500,6 +509,7 @@ public class Maze : MonoBehaviour
     public void ShowMaze()
     {
         HideGraph();
+        
 
         foreach (TileScript tile in Grid)
         {
@@ -583,7 +593,7 @@ public class Maze : MonoBehaviour
 
         foreach (TileScript tile in Grid)
         {
-            if (!TileScript.CorridorCodes.Contains(tile.GetWallCode()))
+            if (!TileScript.corridorCodes.Contains(tile.GetWallCode()))
             {
                 SetTileAsNode(tile);
 
@@ -634,7 +644,7 @@ public class Maze : MonoBehaviour
 
             Node neighbour = graphRepresentation.GetNodeAtPoint(neighbourCoordinates.x, neighbourCoordinates.y);
             node.AddNeighbour(neighbour, dir);
-            neighbour.AddNeighbour(node, TileScript.CorrespondingDirs[dir]);
+            neighbour.AddNeighbour(node, TileScript.correspondingDirs[dir]);
 
             Edge edge = new Edge(node, neighbour);
             graphRepresentation.AddEdge(edge);

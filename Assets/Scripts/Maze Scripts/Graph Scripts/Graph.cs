@@ -104,12 +104,6 @@ public class Graph
         return node1.DistanceBetween(node2);
     }
 
-    // concerned about rounding...
-    private int EuclideanDistance(Node node1, Node node2)
-    {
-        return Mathf.RoundToInt(Mathf.Sqrt(Mathf.Pow(node2.X - node1.X, 2) + Mathf.Pow(node2.Y - node1.Y, 2)));
-    }
-
     // finds the shortest path between two given nodes
     public NodePath AStarSearch(Node start, Node end)
     {

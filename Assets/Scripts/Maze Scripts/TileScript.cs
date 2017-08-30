@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public abstract class TileScript : MonoBehaviour {
+public class TileScript : MonoBehaviour
+{
 
-    public const string VerticalCorridor = "0101", HorizontalCorridor = "1010";
+    public const string verticalCorridor = "0101", horizontalCorridor = "1010";
 
-    public static readonly HashSet<string> CorridorCodes = new HashSet<string>()
+    public static readonly HashSet<string> corridorCodes = new HashSet<string>()
     {
         { "1010" },
         { "0101" }
@@ -14,13 +15,13 @@ public abstract class TileScript : MonoBehaviour {
     [HideInInspector]
     public int X, Y;
 
-    public WallScript WallTemplate;
+    public WallScript wallTemplate;
 
     protected WallScript[] walls = new WallScript[4];
     protected Dictionary<Direction, WallScript> wallDirs = new Dictionary<Direction, WallScript>();
     protected Dictionary<Direction, WallScript> correspondingWallDirs = new Dictionary<Direction, WallScript>();
     
-    public static readonly Dictionary<Direction, Direction> CorrespondingDirs = new Dictionary<Direction, Direction>
+    public static readonly Dictionary<Direction, Direction> correspondingDirs = new Dictionary<Direction, Direction>
     {
         { Direction.North, Direction.South },
         { Direction.East, Direction.West },
@@ -28,36 +29,82 @@ public abstract class TileScript : MonoBehaviour {
         { Direction.West, Direction.East }
     };
 
-    public abstract Vector3 StartingPosition
+    public Vector3 StartingPosition
     {
-        get;
+        get
+        {
+            return Vector3.zero;
+        }
     }
-    public abstract Vector3 HorizontalSpawnIncrement
+    public Vector3 HorizontalSpawnIncrement
     {
-        get;
+        get
+        {
+            return new Vector3(1.8f, 0, 0);
+        }
     }
-    public abstract Vector3 VerticalSpawnIncrement
+    public Vector3 VerticalSpawnIncrement
     {
-        get;
+        get
+        {
+            return new Vector3(0, 0, 1.8f);
+        }
     }
+
+    #region 3D vars/properties
+
+    private MeshRenderer meshRenderer;
+
+    public Material StartingMaterial;
+    public Material VisitedMaterial;
+    public Material StackMaterial;
+    public Material BeginMaterial;
+    public Material EndMaterial;
+    public Material OpenMaterial;
+    public Material ClosedMaterial;
+    public Material SearchMaterial;
+
+    private const float xWallPos = 0.45f, yWallPos = 9.5f;
+
+    #endregion
 
     protected virtual void Awake()
     {
+        meshRenderer = GetComponent<MeshRenderer>();
+        meshRenderer.material = StartingMaterial;
+
+        CreateWalls();
     }
 
     protected virtual void InitWall(Direction dir, Vector3 offset, Vector3 rotation)
     {
         int d = (int)dir;
 
-        walls[d] = Instantiate(WallTemplate, this.transform, false) as WallScript;
+        walls[d] = Instantiate(wallTemplate, this.transform, false) as WallScript;
         walls[d].transform.localPosition = offset;
         walls[d].transform.localRotation = Quaternion.Euler(rotation);
 
         wallDirs.Add(dir, walls[d]);
-        correspondingWallDirs.Add(CorrespondingDirs[dir], walls[d]);
+        correspondingWallDirs.Add(correspondingDirs[dir], walls[d]);
     }
 
-    protected abstract void CreateWalls();
+    protected virtual void CreateWalls()
+    {
+        wallDirs.Clear();
+        correspondingWallDirs.Clear();
+
+        /*
+        WallScript upWall = walls[(int)Direction.North];
+        WallScript rightWall = walls[(int)Direction.East];
+        WallScript downWall = walls[(int)Direction.South];
+        WallScript leftWall = walls[(int)Direction.West];
+        */
+
+        InitWall(Direction.North, new Vector3(0, yWallPos, xWallPos), new Vector3(90, 0, 0));
+        InitWall(Direction.East, new Vector3(xWallPos, yWallPos, 0), new Vector3(90, 90, 0));
+        InitWall(Direction.South, new Vector3(0, yWallPos, -xWallPos), new Vector3(90, 0, 0));
+        InitWall(Direction.West, new Vector3(-xWallPos, yWallPos, 0), new Vector3(90, 90, 0));
+    }
 
     public bool WallActive(Direction d)
     {
@@ -159,21 +206,45 @@ public abstract class TileScript : MonoBehaviour {
         SetWallsFromCode("1111");
     }
 
-    public abstract void Visit();
+    public void Visit()
+    {
+        meshRenderer.material = VisitedMaterial;
+    }
 
-    public abstract void OnStack();
+    public void OnStack()
+    {
+        meshRenderer.material = StackMaterial;
+    }
 
-    public abstract void UnVisit();
+    public void UnVisit()
+    {
+        meshRenderer.material = StartingMaterial;
+    }
 
-    public abstract void MakeStartTile();
+    public void MakeStartTile()
+    {
+        meshRenderer.material = BeginMaterial;
+    }
 
-    public abstract void MakeEndTile();
+    public void MakeEndTile()
+    {
+        meshRenderer.material = EndMaterial;
+    }
 
-    public abstract void MakeOpen();
+    public void MakeOpen()
+    {
+        meshRenderer.material = OpenMaterial;
+    }
 
-    public abstract void MakeClosed();
+    public void MakeClosed()
+    {
+        meshRenderer.material = ClosedMaterial;
+    }
 
-    public abstract void SearchVisit();
+    public void SearchVisit()
+    {
+        meshRenderer.material = SearchMaterial;
+    }
 
     public override string ToString()
     {

@@ -1,22 +1,13 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.UI;
 
-public abstract class GameRunner : MonoBehaviour
+public class GameRunner : MonoBehaviour
 {
-
     protected Text winText;
     protected Maze level;
-    protected TileScript[,] grid;
-    private PlayerController player;
-    private TileScript endTile;
-    private DestinationScript destination;
 
-    public DestinationScript Destination
-    {
-        get { return destination; }
-        protected set { destination = value; }
-    }
+    private PlayerController player;
+    private DestinationScript destination;
 
     public PlayerController playerTemplate;
     public DestinationScript destTemplate;
@@ -29,12 +20,10 @@ public abstract class GameRunner : MonoBehaviour
             if (!value.Playable())
                 Debug.LogError("This level is not playable.", value);
             else
-            {
                 level = value;
-                grid = value.Grid;
-            }
         }
     }
+
     public Text WinText
     {
         get { return winText; }
@@ -45,65 +34,65 @@ public abstract class GameRunner : MonoBehaviour
             winText.gameObject.SetActive(false);
         }
     }
+
     public PlayerController Player
     {
         get { return player; }
-        protected set { player = value; }
     }
-    public TileScript EndTile
+
+    protected TileScript EndTile
     {
-        get { return endTile; }
-        protected set { endTile = value; }
+        get { return level.EndTile; }
     }
+
+    [HideInInspector]
+    public PlayInitializer3D initializer;
+    private const float actorHeight = 1f;
 
     protected virtual void Start ()
     {
-        Debug.Log("start tile is " + level.startTile);
         player = Instantiate(playerTemplate) as PlayerController;
-        player.MazeGraph = level.GraphRepresentation;
+        player.mazeGraph = level.GraphRepresentation;
 
-        EndTile = level.endTile;
         PlaceDestintation();
         PlacePlayer();
+
+        Player.GetComponent<Camera>().enabled = true;
     }
     
 	protected virtual void Update ()
     {
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            Debug.Log("quitting...");
             EndGame();
         }
     }
 
-    protected abstract void PlacePlayer();
-
-    protected abstract void PlaceDestintation();
-
-    protected abstract void PlacePowerups();
-
-    protected abstract void PlaceEnemies();
-
-    public void GameWon()
+    protected virtual void PlacePlayer()
     {
-        StartCoroutine(DisplayWon());
+        Player.transform.position = Level.StartTile.transform.position + new Vector3(0, actorHeight, 0);
+    }
+
+    protected virtual void PlaceDestintation()
+    {
+        destination = Instantiate(destTemplate, EndTile.transform.position + new Vector3(0, 1, 0), Quaternion.identity) as DestinationScript;
+        destination.transform.parent = EndTile.transform;
+        destination.Level = this.Level;
+        destination.Runner = this;
+    }
+
+    protected virtual void PlacePowerups()
+    {
+
     }
 
     public virtual void EndGame()
     {
+        Player.GetComponent<Camera>().enabled = false;
+        Destroy(destination.gameObject);
         Destroy(player.gameObject);
-        Destroy(Destination);
-    }
 
-    protected IEnumerator DisplayWon()
-    {
-        if (WinText != null)
-        {
-            WinText.gameObject.SetActive(true);
-            yield return new WaitForSeconds(3);
-            WinText.gameObject.SetActive(false);
-        }
-        EndGame();
+        initializer.StopPlaying();
     }
 
 }

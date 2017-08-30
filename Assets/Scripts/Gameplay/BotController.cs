@@ -1,14 +1,11 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 delegate void MovementAction(Node node);
 
 public abstract class BotController : EntityController
 {
-    // make a separate class for following a path???
     protected NodePath botPath;
-    //private LinkedListNode<Node> nextInPath;
 
     private MovementAction currentAction;
 
@@ -18,20 +15,15 @@ public abstract class BotController : EntityController
         set { botPath = value; }
     }
 
-    protected override void Start ()
+    protected virtual void Start()
     {
         movementFactor = 2f;
         rotationFactor = 90f;
     }
 
-    protected override void Update()
-    {
-        //if (transform.position == )
-    }
-
     public void InitializeBot(Graph graph)
     {
-        MazeGraph = graph;
+        mazeGraph = graph;
         BotPath = graph.ShortestPath;
     }
 
@@ -47,15 +39,7 @@ public abstract class BotController : EntityController
 
     public void TraversePath()
     {
-
         StartCoroutine(JumpPath());
-
-        /*
-        if (this.transform.position != nextInPath.Value.WorldLocation)
-        {
-            Vector3.MoveTowards(transform.position, nextInPath.Value.WorldLocation, movementFactor * Time.deltaTime);
-        }
-        */
     }
 
     protected IEnumerator JumpPath()

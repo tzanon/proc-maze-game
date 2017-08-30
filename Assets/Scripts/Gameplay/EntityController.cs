@@ -7,31 +7,9 @@ public abstract class EntityController : MonoBehaviour
     protected float movementFactor;
     protected float rotationFactor;
 
-    protected Graph mazeGraph;
+    public Graph mazeGraph;
 
-    protected Node currentNode;
-
-    public Node CurrentNode
-    {
-        get { return currentNode; }
-        set { currentNode = value; }
-    }
-
-    public Graph MazeGraph
-    {
-        get { return mazeGraph; }
-        set { mazeGraph = value; }
-    }
-
-	protected virtual void Start ()
-    {
-        
-	}
-
-    protected virtual void Update ()
-    {
-		
-	}
+    public Node currentNode;
 
     protected virtual void OnTriggerEnter(Collider other)
     {
